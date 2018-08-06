@@ -1,0 +1,5 @@
+#! /usr/bin/python3
+f=open("employees.txt","r")
+for line in f:
+    temp=line.split(" ",1)[0]
+    print(temp[3:]+temp[0:3])

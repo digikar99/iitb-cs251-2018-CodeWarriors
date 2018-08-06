@@ -1,0 +1,17 @@
+P3:
+  snakes.txt is in P3 directory
+
+P4:
+  The input list of students and their locations is to be read
+  from a fixed file 'students.txt'.
+  The input of the 4 coordinates is given on a single line.
+
+P5:
+  
+  That the path to the file containing the two complex numbers is
+  supplied to the program as a commandline argument. And the file
+  contains arguments in the format given in the pdf:
+    two lines of two numbers each
+
+  Rounding off errors due to floating point numbers have not been
+  handled.
