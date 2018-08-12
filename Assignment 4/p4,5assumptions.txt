@@ -1,2 +1,1 @@
 infinity_stones.json is assumed to be present in P5 directory
-In Q4, i am assuming input rating to be precise upto 0.1 only
