@@ -1,0 +1,3 @@
+In transfer.txt a dictionary is created with random characters and numbers with given constraints
+In teams.txt the function makeTeams() is called at the end of the program and it is assummed that the program takes input based on the moodle discussion https://moodle.iitb.ac.in/mod/forum/discuss.php?d=91198 rather
+than using argument as given in the question
