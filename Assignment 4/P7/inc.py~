@@ -9,20 +9,48 @@ import numpy
 # No for-loops allowed
 
 def ang_to_vec(ang):
+    ang = numpy.array(ang)
+
+    # Resize the ang to a Nx1 matrix.
+    # Final result will be a 2xN matrix.
+
+    # Resize ang vector/matrix
+    n = 0
+    if ang.ndim == 1: # if ang is a vector
+        n = ang.shape[0]
+    elif ang.ndim == 2:
+        if ang.shape[0] == 1:
+            n = ang.shape[1]
+        else: #ang.shape[1] == 1 or both are 1.
+            n = ang.shape[0]
+    ang.reshape(n,1)
+
     angRad = numpy.deg2rad(ang)
     sinAng = numpy.sin(angRad)
     cosAng = numpy.cos(angRad)
     vec = numpy.stack([cosAng, sinAng])
-    print(vec.shape)
+    vec = vec.reshape(2,n).transpose()
+    #print(vec.shape)
     return vec
     
     
 def vec_to_ang(vec):
+    vec = numpy.array(vec)
+
+    # Need vec to be a 2xN matrix
+    n = 0
+    if vec.shape[1] == 2: # if vec is Nx2, transpose
+        vec = vec.transpose()
+    #print(vec)
+
+    # ang will be a Nx1 vector
     cosAng = vec[0]
     angRad = numpy.arccos(vec[0])
     ang = numpy.rad2deg(angRad)
+    #print(ang.shape)
+    #print(ang)
     return ang
 
-# l = [0,30,45,60,90,180]
-# print(ang_to_vec(l))
-# print(vec_to_ang(ang_to_vec(l)))
+#l = numpy.array([0,30,45,60,90,180])
+#print(ang_to_vec(l))
+#print(vec_to_ang(ang_to_vec(l)))
