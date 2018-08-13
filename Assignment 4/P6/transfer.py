@@ -34,7 +34,7 @@ for i in g.readlines():
 		if i[0] in B:
 			if int(i[1]) in new_dict:
 				if int(new_dict[int(i[1])]['loyalty']) > 7:
-					raise ValueError
+					raise ValueError("Try another transfer(Player Too Loyal)")
 				else:
 					j=search_low(i[0],new_dict)
 					temp=new_dict[j]['loyalty']
@@ -50,13 +50,13 @@ for i in g.readlines():
 						'loyalty' : temp
 						}
 			else:
-				raise ValueError()
+				raise ValueError("Try another transfer(Wrong Player Number)")
 		else:
 			raise ZeroDivisionError()
-	except ValueError:
-		print("Try another transfer " + str(i[1]))
+	except ValueError as e:
+		print(e)
 	except ZeroDivisionError:
-		print("Try another transfer " + str(i[0]))
+		print("Try another transfer(Wrong Team Name)")
 print("Total Transfers = " + str(total_transfer))
 f.seek(0)
 f.write(json.dumps(new_dict))
