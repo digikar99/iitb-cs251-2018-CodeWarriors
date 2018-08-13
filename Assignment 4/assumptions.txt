@@ -1,0 +1,15 @@
+P1:
+
+  If printing of error is not expected, parser.error() may be used
+  However, that also displays the filename;
+  and no updates on moodle were found until 1900 of 13022018
+  regarding the same.
+
+  1 is not a prime. The range is inclusive of 1 and 1000.
+
+P2:
+  
+
+
+P5:
+  infinity_stones.json is assumed to be present in P5 directory

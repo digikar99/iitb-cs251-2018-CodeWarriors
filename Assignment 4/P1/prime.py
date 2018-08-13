@@ -45,12 +45,15 @@ if args.range:
     arg_list.append( int(parser.parse_args().range[0]))
     arg_list.append( int(parser.parse_args().range[1]))
 if (not args.check_prime) and (not args.range):
-    parser.error('At least one of the following arguments are required: --check_prime, --range')
+    print('At least one of the following arguments are required: --check_prime, --range')
+
+    exit(0)
 
 
 for arg in arg_list:
     if (arg < 1 or 1000 < arg):
-        parser.error('Please enter a value between 1 and 1000 only')
+        print('Error : Please enter a value between 1 and 1000 only')
+        exit(0)
     
 if args.check_prime:
     if checkPrime(args.check_prime):
