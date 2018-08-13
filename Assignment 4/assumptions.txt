@@ -19,6 +19,20 @@ P2:
   In 1-5000, 5000 is excluded.
   In 5000-7000, both are included.
 
+P3:
+  The format given in the input file info_day.csv is assumed to be the
+  output format.
 
 P5:
   infinity_stones.json is assumed to be present in P5 directory
+
+P6:
+  In transfer.txt a dictionary is created with random characters and
+  numbers with given constraints.
+
+  In teams.txt the function makeTeams() is called at the end of the
+  program and it is assummed that the program takes input based on the
+  moodle discussion
+    https://moodle.iitb.ac.in/mod/forum/discuss.php?d=91198
+  rather than using argument as given in the question.
+

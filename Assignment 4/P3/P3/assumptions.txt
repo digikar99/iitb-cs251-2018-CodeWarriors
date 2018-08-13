@@ -1,1 +1,0 @@
-The format given in the input file info_day.csv is assumed to be the output format
