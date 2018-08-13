@@ -8,7 +8,16 @@ P1:
   1 is not a prime. The range is inclusive of 1 and 1000.
 
 P2:
-  
+
+  The strings are of length 4.
+
+  The latest decision is the final:
+  https://moodle.iitb.ac.in/mod/forum/discuss.php?d=91203
+  So, if the number for ask_choice is out-of-range, user is asked
+  to re-enter it.
+
+  In 1-5000, 5000 is excluded.
+  In 5000-7000, both are included.
 
 
 P5:

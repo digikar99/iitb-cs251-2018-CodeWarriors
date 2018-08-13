@@ -27,7 +27,11 @@ def ask_choice(fname):
         int_str = pickle.load(pick_file)
     target = int(input('Enter number: '))
     #print(int_str)
+    while target<5000 or 7000<target:
+        target = int(input('Enter number: '))
     req_pairs = [(x,y) for x in int_str for y in int_str if x+y==target]
+    if req_pairs == []:
+        req_pairs = [(x,y) for x in int_str for y in int_str if x+y<target]
     if req_pairs == []:
         print('Not Possible')
     else:
