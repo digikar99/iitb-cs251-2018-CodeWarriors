@@ -29,7 +29,8 @@ def ang_to_vec(ang):
     sinAng = numpy.sin(angRad)
     cosAng = numpy.cos(angRad)
     vec = numpy.stack([cosAng, sinAng])
-    vec = vec.reshape(2,n).transpose()
+    #print(vec.shape)
+    vec = vec.transpose()
     #print(vec.shape)
     return vec
     
@@ -44,12 +45,12 @@ def vec_to_ang(vec):
 
     # ang will be a Nx1 vector
     cosAng = vec[0]
-    angRad = numpy.arccos(vec[0])
+    angRad = numpy.arctan2(vec[1],vec[0])
     ang = numpy.rad2deg(angRad)
     #print(ang.shape)
     #print(ang)
     return ang
 
-#l = numpy.array([0,30,45,60,90,180])
+#l = numpy.array([0.0,30,45,60,90,180,-135,-30,105])
 #print(ang_to_vec(l))
 #print(vec_to_ang(ang_to_vec(l)))
