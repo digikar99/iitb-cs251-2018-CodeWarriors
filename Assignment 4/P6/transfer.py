@@ -1,3 +1,4 @@
+#! /usr/bin/python3
 import random
 import json
 A=random.sample(range(1,1000),100)
@@ -22,7 +23,7 @@ for i in range(0,100):
 f=open("players.json","w")
 f.write(json.dumps(dict_j))
 f.close()
-f=open("players.json","rw+")
+f=open("players.json","r+")
 new_dict=json.load(f)
 new_dict=dict_j
 g=open("transfer.txt","r")
@@ -37,16 +38,17 @@ for i in g.readlines():
 				else:
 					j=search_low(i[0],new_dict)
 					temp=new_dict[j]['loyalty']
-					new_dict[j]={
-					'team' : new_dict[int(i[1])]['team'],
-					'loyalty' : temp
-					}
-					temp = new_dict[int(i[1])]['loyalty']
-					new_dict[int(i[1])]={
-					'team' : str(i[0]),
-					'loyalty' : temp
-					}
-					total_transfer+=1
+					if not new_dict[int(i[1])]['team']==i[0]:
+						total_transfer+=1
+						new_dict[j]={
+						'team' : new_dict[int(i[1])]['team'],
+						'loyalty' : temp
+						}
+						temp = new_dict[int(i[1])]['loyalty']
+						new_dict[int(i[1])]={
+						'team' : str(i[0]),
+						'loyalty' : temp
+						}
 			else:
 				raise ValueError()
 		else:
@@ -55,5 +57,7 @@ for i in g.readlines():
 		print("Try another transfer " + str(i[1]))
 	except ZeroDivisionError:
 		print("Try another transfer " + str(i[0]))
+print("Total Transfers = " + str(total_transfer))
+f.seek(0)
 f.write(json.dumps(new_dict))
 f.close()
