@@ -1,0 +1,44 @@
+helloworld: helloworld.cpp
+	g++ helloworld.cpp -o helloworld -I.
+
+usespthread: usespthread.cpp
+	g++ usespthread.cpp -pthread -o usespthread
+
+libMyEngineDynamic.so: myengine/myengine.cpp myengine/myengine.hpp
+	g++ -fPIC -c myengine/myengine.cpp
+	g++ -fPIC -shared -o libMyEngineDynamic.so myengine.o 
+
+libMyEngineStatic.a: myengine/myengine.cpp myengine/myengine.hpp
+	g++ -c -fpic myengine/myengine.cpp
+	ar r libMyEngineStatic.a myengine.o
+
+.PHONY: installdynamic
+installdynamic: libMyEngineDynamic.so
+	sudo cp libMyEngineDynamic.so /usr/local/lib
+	sudo cp myengine/myengine.hpp /usr/local/include
+
+.PHONY: installstatic
+installstatic: libMyEngineStatic.a
+	sudo cp libMyEngineStatic.a /usr/local/lib
+	sudo cp myengine/myengine.hpp /usr/local/include
+
+# Great thanks to the following:
+# https://stackoverflow.com/questions/4623364/undefined-reference-when-linking-against-a-static-library
+mygamestatic: installstatic
+	g++ -o mygamestatic  mygame/mygame.cpp -l MyEngineStatic
+
+mygamedynamic: installdynamic
+	g++ -o mygamedynamic mygame/mygame.cpp -l MyEngineDynamic
+
+# Removes the intermediate files only
+.PHONY: clean
+clean:
+	for file in myengine.o libMyEngineDynamic.so libMyEngineStatic.a mygamestatic mygamedynamic usespthread helloworld ; \
+	do \
+		if [ -e "$$file" ] ;\
+		then \
+			rm "$$file" ;\
+		fi; \
+	done
+
+
