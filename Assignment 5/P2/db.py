@@ -40,7 +40,6 @@ def returnCount(cat_name):
     res = cur.fetchall()
     print(res[0][0])
 
-#returnCount('B.Tech - I')
-#returnCount('Ph.D')
-    
+cat_name = input("Enter Category Name: ")
+returnCount(cat_name)
 conn.close()

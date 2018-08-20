@@ -21,8 +21,8 @@ def pass_time(lat,lng):
     pos = random.randint(0,4)
     timestamp = time_list[pos]['risetime']
     dt = datetime.fromtimestamp(timestamp)
-    print("Date:", str(dt.day) + "/" + str(dt.month) + "/" + str(dt.year))
-    print("Time:", str(dt.hour) + ":" + str(dt.minute))
+    print("Date:", "{:02}".format(dt.day) + "/" + "{:02}".format(dt.month) + "/" + str(dt.year))
+    print("Time:", "{:02}".format(dt.hour) + ":" + "{:02}".format(dt.minute))
     dur = int(time_list[pos]['duration'])
     dur_min = dur // 60
     dur_sec = dur % 60
