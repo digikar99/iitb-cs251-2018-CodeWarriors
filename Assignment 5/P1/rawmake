@@ -16,6 +16,7 @@ libMyEngineStatic.a: myengine/myengine.cpp myengine/myengine.hpp
 installdynamic: libMyEngineDynamic.so
 	sudo cp libMyEngineDynamic.so /usr/local/lib
 	sudo cp myengine/myengine.hpp /usr/local/include
+	sudo ldconfig
 
 .PHONY: installstatic
 installstatic: libMyEngineStatic.a
