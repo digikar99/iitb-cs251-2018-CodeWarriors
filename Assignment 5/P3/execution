@@ -1,21 +1,19 @@
-version.h : execute_cmd.c
-buildversion.o : version.h
-bashversion : version.h buildversion.o
-.build : execute_cmd.c version.h bashversion
-execute_cmd.o : execute_cmd.c
-variables.o : version.h
-version.o :version.h
-targets :
-builtins/libbuiltins.a : version.h
-lib/glob/libglob.a : .build
-lib/sh/libsh.a : .build
-lib/readline/libreadline.a : .build
-lib/readline/libhistory.a : .build
-lib/termcap/libtermcap.a : .build
-lib/tilde/libtilde.a : .build
-malloc :
-lib/malloc/libmalloc.a : .build
-bash : .build execute_cmd.o variables.o version.o lib/malloc/libmalloc.a
-bashbug : bashversion
-.made : bash
-all : 
+version.h: execute_cmd.c
+buildversion.o: version.h
+bashversion: version.h buildversion.o
+.build: execute_cmd.c version.h bashversion
+execute_cmd.o: execute_cmd.c
+variables.o: version.h
+version.o: version.h
+builtins/libbuiltins.a: version.h
+lib/glob/libglob.a: .build
+lib/sh/libsh.a: .build
+lib/readline/libreadline.a: .build
+lib/readline/libhistory.a: .build
+lib/termcap/libtermcap.a: .build
+lib/tilde/libtilde.a: .build
+lib/malloc/libmalloc.a: .build
+malloc: malloc.o trace.o stats.o table.o watch.o
+bash: .build execute_cmd.o variables.o version.o lib/malloc/libmalloc.a
+bashbug: bashversion
+.made: bash bashbug
