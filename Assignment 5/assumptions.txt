@@ -1,1 +1,8 @@
- 
+P2:
+
+Assumes all the names are of students. Each student corresponds to 2 'a' tags in div.mpart.
+
+P3:
+
+in file execution it is assumed that only files should be written thus avoiding the target 'targets'. it also include a file named 'malloc' but it didnt after execution of the makefile , i.e, it exits while makefile runs. Also we have written all dependencies of 'malloc' since malloc didnt exist at the beginning and is deleted at the end
+
