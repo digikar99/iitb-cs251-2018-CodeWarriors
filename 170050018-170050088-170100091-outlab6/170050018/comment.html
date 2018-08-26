@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" href="custom.css">
+
+    <title>Shubhamkar B. Ayare, IITB CSE</title>
+    
+  </head>
+  <body>
+    <!-- The whole page - START-->
+    <div class="container-fluid">
+      <div class="row">
+
+          <div class="col-md-2"></div>
+
+          <!-- Sidebar | Navbar - Start -->
+          <div id="nav-placeholder"></div>
+          <!-- Sidebar | Navbar - End -->
+
+          <div class="col-sm-8 col-md-6 col-xs-12" id="main">
+            <h1 class="hidden-xs">Shubhamkar B. Ayare</h1>
+          
+
+            <div class="tall-pg">
+              <div class="visible-xs" style="text-align:center; color:#bbb;">Screen space left for tall devices, for ease of one hand usage.</div>
+              <form class="form-horizontal" action="php/comment.php" method="POST" name="Form" onsubmit="return validateForm()">
+                <div class="form-group">
+                  <label class="control-label col-md-3 col-sm-3" for="name">Your Name:</label>
+                  <div class="col-sm-9 col-md-9">
+                    <input type="text" class="form-control" name="name">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="control-label col-md-3 col-sm-3" for="comment">Comment:</label>
+                  <div class="col-sm-9 col-md-9">
+                    <textarea class="form-control" rows="5" name="comment"></textarea>
+                  </div>
+                </div>
+                  <button type="submit" class="btn btn-default center-block" name="submit">Submit</button>
+              </form>
+            </div>
+
+          </div>
+      </div>
+    </div>
+
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    <script src="js/nav.js"> </script>
+    <script type="text/javascript">
+        function validateForm()
+        {
+            var a=document.forms["Form"]["name"].value;
+            var b=document.forms["Form"]["comment"].value;
+            if (a==null || a=="" || b==null || b=="")
+            {
+                alert("Please Fill All Required Field");
+                return false;
+            }
+        }
+    </script>
+  </body>
+</html>

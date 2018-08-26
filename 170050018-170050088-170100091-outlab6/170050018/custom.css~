@@ -103,22 +103,3 @@ a:hover{
 .accordion{
 	background-color:#00ffff;
 }
-
-.comment{
-	border:1px solid;
-	margin-top:10px;
-	margin-bottom:10px;
-	border-radius:1mm;
-	padding: 5px 5px 5px 5px;
-	background-color:#ffb3b3;
-}
-.comment-name{
-	text-decoration:underline;
-}
-.comment-comment{
-	text-align:justify;
-}
-.timestamp{
-	font-weight:bold;
-	text-align:right;
-}
