@@ -98,6 +98,13 @@ a:hover{
 
 .cs251-photo{
 	height:150px;
+	margin:20px;
+}
+
+@media only screen (min-width:768px) and (max-width:992px){
+	.cs251-name{
+		margin-top:50px;
+	}
 }
 
 .accordion{
@@ -121,4 +128,13 @@ a:hover{
 .timestamp{
 	font-weight:bold;
 	text-align:right;
+}
+
+#time{
+	text-align:center;
+	margin-top:5px;
+	margin-bottom:10px;
+	background-color:#aaa;
+	border-radius:2mm;
+	padding:5px;
 }
