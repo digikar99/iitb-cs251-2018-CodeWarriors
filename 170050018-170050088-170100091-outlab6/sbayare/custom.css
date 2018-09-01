@@ -1,0 +1,140 @@
+#sidebar{
+	position:fixed;
+	height:100vh;
+	background-color:#111;
+	padding-top:20px;
+	padding-left:0px;
+	padding-right:0px;
+	width:15%;
+}
+
+.sidebar-item{
+	font-size:16px;
+	padding-top:5px;
+	padding-left:10px;
+	padding-right:10px;
+	padding-bottom:5px;
+	border-top:1px solid;
+	border-bottom:1px solid;
+	
+}
+
+.sidebar-item:hover{
+	font-weight:bold;
+	opacity:none;
+}
+
+.sidebar-item > a {
+	color:#9d9d9d;
+	display:block;
+}
+
+.sidebar-item:hover > a {
+	/* color:#444; */
+	text-decoration:none;
+}
+
+#main{
+	position:static;
+	min-height:100vh;
+}
+
+.carousel-inner > .item > img, .carousel-inner > .item > a > img{
+	width:640px;
+}
+
+.inverted{
+	color:#fff;
+}
+
+#oneliner{
+	background-color:#ffcc99;
+	border:2px solid;
+	border-radius:2mm;
+	opacity:0.6;
+	font-weight:bold;
+	padding:5px 5px 5px 5px;
+	margin-top:15px;
+}
+
+#counter{
+	background-color:#111;
+	border:2px solid;
+	border-radius:2mm;
+	padding:5px 5px 5px 5px;
+	position:absolute;
+	bottom:20px;
+	right:30px;
+}
+
+@media (min-width:992px){
+	#counter{
+		right: calc(30px + 17vw);
+	}
+}
+
+.panel .panel-heading{
+	background-color:#00ffff;
+	color:#000;
+	text-align:left;
+}
+.panel-title > a{
+	display:block;
+}
+a:hover{
+	text-decoration:none;
+}
+
+@media(max-width:576px){
+	.tall-pg{
+		padding-top: calc(100vh - 500px);
+		padding-bottom:50px;
+	}
+	#counter{
+		bottom:70px;
+		right:15px;
+	}
+}
+
+.cs251-photo{
+	height:150px;
+	margin:20px;
+}
+
+@media only screen (min-width:768px) and (max-width:992px){
+	.cs251-name{
+		margin-top:50px;
+	}
+}
+
+.accordion{
+	background-color:#00ffff;
+}
+
+.comment{
+	border:1px solid;
+	margin-top:10px;
+	margin-bottom:10px;
+	border-radius:1mm;
+	padding: 5px 5px 5px 5px;
+	background-color:#ffb3b3;
+}
+.comment-name{
+	text-decoration:underline;
+}
+.comment-comment{
+	text-align:justify;
+}
+.timestamp{
+	font-weight:bold;
+	text-align:right;
+}
+
+#time{
+	text-align:center;
+	margin-top:5px;
+	margin-bottom:10px;
+	background-color:#aaa;
+	border-radius:2mm;
+	padding:5px;
+}

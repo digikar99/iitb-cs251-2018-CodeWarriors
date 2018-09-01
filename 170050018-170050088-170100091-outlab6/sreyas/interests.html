@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link rel="icon" href="webicon.jpeg">
+  <title>Interests</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+body {font-family: Arial;
+background-color: black;}
+h3
+{
+  color: white;
+}
+
+  .main-nav
+  {
+    color: white;
+    font-size:15px;
+    margin-top: 30px;
+    text-align: center;
+  }
+  .main-nav li
+{
+  color: white;
+  display: inline-block;
+}
+.main-nav li a:hover
+{
+    border: 1px solid white;
+}
+.main-nav li.active a
+{
+    border: 1px solid white;
+    background-color: darkorange;
+    
+}
+.main-nav li a
+{
+    color: white;
+    text-decoration: none;
+    padding: 5px 20px;
+    font-family: "Roboto", sans-serif;
+    font-size: 15px;
+}
+
+/* Style the tab */
+.tab {
+    overflow: hidden;
+    border: 1px solid #ccc;
+    background-color: #f1f1f1;
+
+}
+
+/* Style the buttons inside the tab */
+.tab button {
+    background-color: inherit;
+    float: left;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    padding: 14px 16px;
+    transition: 0.3s;
+    font-size: 17px;
+}
+
+/* Change background color of buttons on hover */
+.tab button:hover {
+    background-color: #ddd;
+}
+
+/* Create an active/current tablink class */
+.tab button.active {
+    background-color: #ccc;
+}
+
+/* Style the tab content */
+.tabcontent {
+    display: none;
+    padding: 6px 12px;
+    border: 1px solid #ccc;
+    border-top: none;
+    text-align: center;
+}
+</style>
+</head>
+<body>
+
+    <ul class="main-nav">
+    <li><a href="index.php"> HOME </a></li>	
+    <li class="active" ><a href="interests.html"> INTERESTS </a></li>
+    <li><a href="project.html"> PROJECTS </a></li>
+    <li><a href="https://www.cse.iitb.ac.in/~sbayare/cs251.php"> TEAM </a></li>
+    <li><a href="contact.html"> CONTACTS </a></li>
+    <li><a href="academics.php"> ACADEMICS </a></li>
+    <li><a href="comment.html"> COMMENT </a></li>
+    <li><a href="view_comments.php"> COLLECTION </a></li>
+    </ul> 
+
+
+<div class="tab">
+  <button class="tablinks" onclick="openCity(event, 'Interests')">Interests</button>
+  <button class="tablinks" onclick="openCity(event, 'Ambitions')">Ambitions</button>
+  <button class="tablinks" onclick="openCity(event, 'Goals')">Goals</button>
+  <button class="tablinks" onclick="openCity(event, 'Hobbies')">Hobbies</button>
+  <button class="tablinks" onclick="openCity(event, 'Favourites')">Favourites</button>
+</div>
+
+<div id="Interests" class="tabcontent">
+  <h3>Interests</h3>
+  <p style="color:white">I am interested in maths physics coding and computer science</p>
+</div>
+
+<div id="Ambitions" class="tabcontent">
+  <h3>Ambitions</h3>
+  <p style="color:white">I aim to become a computer engineer</p> 
+</div>
+
+<div id="Goals" class="tabcontent">
+  <h3>Goals</h3>
+  <p style="color:white">To be best at what i am doing</p>
+</div>
+
+<div id="Hobbies" class="tabcontent">
+  <h3>Hobbies</h3>
+  <p style="color:white">Playing games<br><br>Reading about history , biolgy</p>
+</div>
+
+<div id="Favourites" class="tabcontent">
+  <h3>Favourites</h3>
+  <p style="color:white">I am not at all picky , but i love south indian foods</p>
+</div>
+
+<script>
+function openCity(evt, cityName) {
+    var i, tabcontent, tablinks;
+    tabcontent = document.getElementsByClassName("tabcontent");
+    for (i = 0; i < tabcontent.length; i++) {
+        tabcontent[i].style.display = "none";
+    }
+    tablinks = document.getElementsByClassName("tablinks");
+    for (i = 0; i < tablinks.length; i++) {
+        tablinks[i].className = tablinks[i].className.replace(" active", "");
+    }
+    document.getElementById(cityName).style.display = "block";
+    evt.currentTarget.className += " active";
+}
+</script>
+     
+</body>
+</html> 

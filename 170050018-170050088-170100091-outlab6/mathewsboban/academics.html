@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="icon" href="M.jpeg">
+  <title>Academics</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <style>
+
+table {
+    font-family: arial, sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+}
+
+td, th {
+    border: 1px solid #dddddd;
+    text-align: left;
+    padding: 8px;
+}
+
+tr {
+    background-color: #dddddd;
+}
+    
+    
+.accordion {
+    background-color: #eee;
+    color: #444;
+    cursor: pointer;
+    padding: 18px;
+    width: 100%;
+    border: none;
+    text-align: left;
+    outline: none;
+    font-size: 15px;
+    transition: 0.4s;
+}
+
+.active, .accordion:hover {
+    background-color: #ccc; 
+}
+
+.panel {
+    padding: 0 18px;
+    display: none;
+    background-color: white;
+    overflow: hidden;
+}
+</style>
+</head>
+
+<body>
+
+ <nav class="navbar navbar-inverse">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="#">Welcome Aboard</a>
+    </div>
+    <ul class="nav navbar-nav">
+      <li class="active"><a href="index.php">Home</a></li>
+      <li><a href="academics.html">Academics</a></li>
+      <li><a href="misc.html">Interests</a></li>
+      <li><a href="projects.html">Projects</a></li>
+      <li><a href="https://www.cse.iitb.ac.in/~sbayare/cs251.php">CS 251</a></li>
+      <li><a href="contact.html">Contact</a></li>
+      <li><a href="comment.html">Comments</a></li>
+      <li><a href="view_comments.php">Previous Comments</a></li>
+    </ul>
+  </div>
+</nav>
+
+  
+<h2 style="text-align:center">Academics</h2>
+<h3>Completed Courses</h3>
+<button class="accordion">Sem 1</button>
+<div class="panel">
+  <ul>
+    <li>Organic & Inorganic Chemistry</li>
+    <li>Physical Chemistry</li>
+    <li>Computer Programming and Utilization</li>
+    <li>Calculus</li>
+    <li>Workshop Practice</li>
+    <li>Quantum Physics and application</li>
+    <li>Physics Lab</li>
+  </ul>
+</div>
+
+<button class="accordion">Sem 2</button>
+<div class="panel">
+  <ul>
+    <li>Biology</li>
+    <li>Engineering Mechanics</li>
+    <li>Chemistry Lab</li>
+    <li>Linear Algebra</li>
+    <li>Differential Equations</li>
+    <li>Engineering Graphics & Drawing</li>
+    <li>Basics of Electricity & Magnetism</li>
+  </ul>
+</div>
+
+<h3>Current Sem</h3>
+<button class="accordion">Time Table</button>
+<div class =panel>
+<table>
+  <tr>
+    <th>Day</th>
+    <th>Class 1</th>
+    <th>Class 2</th>
+    <th>Class 3</th>
+  </tr>
+  <tr>
+    <th>Monday</th>
+    <th>8:30-9:30 Discrete Structures</th>
+    <th>11:30-12:30 Introduction to Electrical and Electronic Circuits</th>
+    <th>15:30-17:00 Data Structures and Algorithms</th>
+  </tr>
+  <tr>
+    <th>Tuesday</th>
+    <th>8:30-9:30 Introduction to Electrical and Electronic Circuits</th>
+    <th>9:30-10:30 Discrete Structures</th>
+    <th>14:00-18:00 Software Systems Lab</th>
+  </tr>
+  <tr>
+    <th>Wednesday</th>
+    <th>11:00-12:30 Data Analysis and Interpretation</th>
+    <th> -- </th>
+    <th> -- </th>
+  </tr>
+  <tr>
+    <th>Thursday</th>
+    <th>9:30-10:30 Introduction to Electrical and Electronic Circuits</th>
+    <th>10:30-11:30 Discrete Structures</th>
+    <th>15:30-17:00 Data Structures and Algorithms</th>
+  </tr>
+  <tr>
+    <th>Friday</th>
+    <th>11:00-12:30 Data Analysis and Interpretation</th>
+    <th>14:00-17:00 Data Structures and Algorithms Lab</th>
+    <th>17:30-19:00 Introduction to Electrical and Electronic Circuits (Tutorial)</th>
+  </tr>
+</table>
+</div>
+
+<script>
+var acc = document.getElementsByClassName("accordion");
+var i;
+
+for (i = 0; i < acc.length; i++) {
+    acc[i].addEventListener("click", function() {
+        this.classList.toggle("active");
+        var panel = this.nextElementSibling;
+        if (panel.style.display === "block") {
+            panel.style.display = "none";
+        } else {
+            panel.style.display = "block";
+        }
+    });
+}
+</script>
+
+</body>
+</html>

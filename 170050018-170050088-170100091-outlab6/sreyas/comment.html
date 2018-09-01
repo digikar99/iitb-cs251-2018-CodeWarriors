@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <link rel="icon" href="webicon.jpeg">
+    <title>Comment</title>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" href="custom.css">
+
+    <style>
+    body {font-family: Arial;
+background-color: black;}
+h3
+{
+  color: white;
+}
+
+  .main-nav
+  {
+    color: white;
+    font-size:15px;
+    margin-top: 30px;
+    text-align: center;
+  }
+  .main-nav li
+{
+  color: white;
+  display: inline-block;
+}
+.main-nav li a:hover
+{
+    border: 1px solid white;
+}
+.main-nav li.active a
+{
+    border: 1px solid white;
+    background-color: darkorange;
+    
+}
+.main-nav li a
+{
+    color: white;
+    text-decoration: none;
+    padding: 5px 20px;
+    font-family: "Roboto", sans-serif;
+    font-size: 15px;
+}
+
+/* Style the tab */
+.tab {
+    overflow: hidden;
+    border: 1px solid #ccc;
+    background-color: #f1f1f1;
+
+}
+
+/* Style the buttons inside the tab */
+.tab button {
+    background-color: inherit;
+    float: left;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    padding: 14px 16px;
+    transition: 0.3s;
+    font-size: 17px;
+}
+
+/* Change background color of buttons on hover */
+.tab button:hover {
+    background-color: #ddd;
+}
+
+/* Create an active/current tablink class */
+.tab button.active {
+    background-color: #ccc;
+}
+
+/* Style the tab content */
+.tabcontent {
+    display: none;
+    padding: 6px 12px;
+    border: 1px solid #ccc;
+    border-top: none;
+    text-align: center;
+  </style>
+
+
+  </head>
+  <body>
+
+
+        <ul class="main-nav">
+    <li><a href="index.php"> HOME </a></li> 
+    <li><a href="interests.html"> INTERESTS </a></li>
+    <li><a href="project.html"> PROJECTS </a></li>
+    <li><a href="https://www.cse.iitb.ac.in/~sbayare/cs251.php"> TEAM </a></li>
+    <li><a href="contact.html"> CONTACTS </a></li>
+    <li><a href="academics.php"> ACADEMICS </a></li>
+    <li class="active" ><a href="comment.html"> COMMENT </a></li>
+    <li><a href="view_comments.php"> COLLECTION </a></li>
+    </ul> 
+
+<br><br>
+
+
+
+    <!-- The whole page - START-->
+    <div class="container-fluid">
+      <div class="row">
+
+          <div class="col-md-2"></div>
+
+          <!-- Sidebar | Navbar - Start -->
+          <div id="nav-placeholder"></div>
+          <!-- Sidebar | Navbar - End -->
+
+          <div class="col-sm-8 col-md-6 col-xs-12" id="main">
+
+            <div class="tall-pg">
+              <div class="visible-xs" style="text-align:center; color:#bbb;">Screen space left for tall devices, for ease of one hand usage.</div>
+              <form class="form-horizontal" action="comment.php" method="POST" name="Form" onsubmit="return validateForm()">
+                <div class="form-group">
+                  <label class="control-label col-md-3 col-sm-3" for="name" style="color: white" >Your Name:</label>
+                  <div class="col-sm-9 col-md-9">
+                    <input type="text" class="form-control" name="name">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="control-label col-md-3 col-sm-3" for="comment" style="color: white" s>Comment:</label>
+                  <div class="col-sm-9 col-md-9">
+                    <textarea class="form-control" rows="5" name="comment"></textarea>
+                  </div>
+                </div>
+                  <button style="margin-left:500px;" type="submit" class="btn btn-default center-block" name="submit">Submit</button>
+              </form>
+            </div>
+
+          </div>
+      </div>
+    </div>
+
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    <script src="js/nav.js"> </script>
+    <script type="text/javascript">
+        function validateForm()
+        {
+            var a=document.forms["Form"]["name"].value;
+            var b=document.forms["Form"]["comment"].value;
+            if (a==null || a=="" || b==null || b=="")
+            {
+                alert("Please Fill All Required Field");
+                return false;
+            }
+        }
+    </script>
+  </body>
+</html>
