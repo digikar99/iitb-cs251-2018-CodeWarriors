@@ -1,0 +1,76 @@
+\documentclass{beamer}
+ 
+\usepackage[utf8]{inputenc}
+\useoutertheme{shadow}
+\usetheme{Berlin}
+\setbeamertemplate{title page}[default][rounded=true,shadow=true]
+
+
+\colorlet{titleleft}{blue!50!black}
+\colorlet{titleright}{black}
+\makeatletter
+\pgfdeclarehorizontalshading[titleleft,titleright]{beamer@frametitleshade}
+{\paperheight}{
+	color(0pt)=(titleleft);
+	color(\paperwidth)=(titleright)
+}
+
+
+\makeatother
+\setbeamertemplate{mini frames}{}
+\setbeamertemplate{title page}[default][rounded=true,shadow=true]
+
+
+\title{CS251: Software Lab}
+\subtitle{\LaTeX \ Outlab 7}
+\author[CodeWarriors,170050018,170050088,170100091]{CodeWarriors \newline 170050018 \newline 170050088 \newline 170100091}
+\institute{Indian Institute of Technology,Bombay }
+\date{August 30,2018} 
+\logo{\includegraphics[height=1cm]{logo.png} 
+\vspace{8pt} \hspace{10pt}}
+ 
+ 
+\begin{document}
+\frame{\titlepage}
+ 
+\begin{frame}
+\frametitle{Table Of Contents}
+\tableofcontents
+\end{frame}
+\section{Itemize and Enumerate}
+
+\begin{frame}
+\frametitle{Itemize}
+
+\begin{itemize}
+\item \LaTeX \ typesets a file of text using the TEX program.
+\item \LaTeX \ is widely used in academia for the communication and publication of scientific documents in many fields, including
+mathematics, physics, computer science, statistics, economics
+and political science.
+\item \LaTeX \ can be used as a standalone document preparation system or as an intermediate format.
+\item \LaTeX \ is intended to provide a high-level language that accesses the power of TeX in an easier way for writers
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Enumerate}
+\begin{enumerate}
+\item \LaTeX \ typesets file of text using the TEX program.
+\item \LaTeX \ is widely used in academia for the communication and publication of scientific documents in many fields, including mathematics, physics, computer science, statistics, economics and political science. 
+\item \LaTeX \ can be used as a standalone document preparation system or as an intermediate format.
+\item \LaTeX \ is intended to provide a high-level language that accesses the power of TeX in an easier way for writers.
+\end{enumerate}
+
+
+\end{frame}
+
+\begin{frame}
+\begin{center}
+\huge Thank You
+\end{center}
+\end{frame}
+
+\end{document}
