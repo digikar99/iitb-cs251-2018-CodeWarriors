@@ -1,14 +1,16 @@
 \documentclass[15pt,a4paper]{article}
 \usepackage{tikz}
 \usepackage{graphicx}
+\usepackage{graphics}
 \usepackage{amsmath}
 \graphicspath{ {images/} }
 \usepackage{multirow}
 \usepackage{caption}
 \usepackage{subcaption}
-\usepackage[left=1.5in, right=1.5in, top=1.5in, bottom=1.5in]{geometry}
+\usepackage[left=4.2cm, right=4.2cm, top=4.2cm, bottom=4.2cm]{geometry}
 \usepackage{titling}
-\usetikzlibrary{shapes,decorations,arrows}
+\usepackage[LGRgreek]{mathastext}
+\usetikzlibrary{shapes,decorations,arrows,positioning}
 \tikzstyle{cloud} = [draw, ellipse]
 \tikzstyle{block} = [rectangle, draw,text centered]
 \tikzstyle{line} = [draw, -latex']
@@ -20,9 +22,9 @@
 
 \begin{document}
 \title{\textbf{Software Systems Lab 7:\\
-TeX Lab\\}}
+TeX Lab}}
 \author{Team CodeWarriors}
-\date{02 September 2018}
+\date{02 September, 2018}
 \begin{titlepage}
 \maketitle
 \pagenumbering{gobble}
@@ -31,22 +33,24 @@ TeX Lab\\}}
 \newpage
 
 \pagenumbering{arabic}
+
 \begin{figure}
 \centering
-\begin{tikzpicture}[node distance=2cm]
+\begin{tikzpicture}[node distance=2.5cm, text width=3cm, align=center,
+minimum height=1cm, outer sep=0]
 
 \centering
 
-\node[cloud](start){Start Life};
+\node[cloud, aspect=2, text width=2.25cm](start){Start Life};
 \node[block,below of=start](pray){Pray};
 \path [line] (start) -- (pray);
-\node[decision,below of=pray](did){Did it work?};
+\node[draw, diamond,below of=pray,aspect=1.5, text width=1.75cm](did){Did it \\ work?};
 \path [line] (pray) -- (did);
-\node[block,below of=did](praise){Praise the Lord};
+\node[block,below of=did](praise){Praise \\ the Lord};
 \path [line] (did) -- (praise);
-\node[block,right of=praise,node distance=5cm](god){God works in mysterious ways};
+\node[block,right of=praise,node distance=5cm](god){God works \\ in myste-\\rious ways};
 \path [line] (did) -| (god);
-\node[cloud,below of=praise](die){Die};
+\node[cloud,below of=praise, , text width=2cm](die){Die};
 \path[line] (praise) -- (die);
 \path[line] (god)|-(die); 
 
@@ -57,6 +61,7 @@ TeX Lab\\}}
 
 
 
+\fontsize{11}{12}\selectfont
 \par
 \vspace{5mm}
 Figure 1 above refers to a funny conundrum theists are believed to be
@@ -71,9 +76,10 @@ methodology.
 
 \newpage
 
-\begin{table}[]
+\begin{table}
 \caption{Table depicting the use of both multirow and multicolumn}
 \centering
+\resizebox{\columnwidth}{!}{%
 \begin{tabular}{ |c|c|c|c|c|c|c|c|c|c|c| }
 \cline{3-11}
 \multicolumn{2}{c|}{}&
@@ -154,6 +160,7 @@ methodology.
 
 
 \end{tabular}
+}
 
 
   
@@ -187,20 +194,21 @@ Now, we will import images side by side in the same document
 
 \begin{figure}
 \centering
-\begin{minipage}{.5\textwidth}
+\begin{minipage}{0.5\textwidth}
   \centering
-  \includegraphics[width=5cm]{fig1.png}
+  \includegraphics[width=6.33cm]{fig1.png}
   \captionof{figure}{First figure}
   \label{fig:test1}
 \end{minipage}%
-\begin{minipage}{.5\textwidth}
+\begin{minipage}{0.5\textwidth}
   \centering
-  \includegraphics[width=5cm]{fig2.png}
+  \includegraphics[width=6.33cm]{fig2.png}
   \captionof{figure}{Second figure}
   \label{fig:test2}
 \end{minipage}
 \end{figure}
 
+\fontsize{11}{14}\selectfont
 \par
 The images have been put in, and they are side by side in the same docu-
 ment on the same page. We have used the package floatrow and graphicx to
@@ -209,14 +217,20 @@ phone. I am adding an mathematical equation now just for the sake of it,
 because I think this is the only thing left to be demonstrated.
 
 \begin{equation} \label{nll}
-NLL=\sum_{i=1}^{N}\log(P(s_i))
+\textit{NLL}=\sum_{i=1}^{N}\log(P(s_i))
 \end{equation}
 
 \begin{flushleft}
 where
 \textit{s\textsubscript{i}} 
-is the length of the \textit{i}\textsuperscript{th} saccade.
+is the length of the \textit{i}\textsuperscript{\textit{th}} saccade.
 \end{flushleft}
+
+
+\par
+This text will refer to Equation 1 above. In case you would like to see an
+alternative method to align the images, for instance images as subfigures, let
+me try to do it.
 
 \newpage
 
@@ -224,32 +238,33 @@ is the length of the \textit{i}\textsuperscript{th} saccade.
     \centering
     \begin{subfigure}[b]{0.4\textwidth}
         \centering
-        \includegraphics[width=\textwidth]{fig3_a.jpg}
+        \includegraphics[width=5.1cm, height=3.0cm]{fig3_a.jpg}
         \caption{Caption 1}
     \end{subfigure}
     \hfill
     \begin{subfigure}[b]{0.4\textwidth}
         \centering
-        \includegraphics[width=\textwidth]{fig3_b.jpg}
+        \includegraphics[width=5.1cm, height=3.0cm]{fig3_b.jpg}
         \caption{Caption 2}
     \end{subfigure}
     \caption{Caption for this figure with two images}
 \end{figure}
 
-
+\fontsize{11}{12.5}\selectfont
 This is another alternative to posting images in a \LaTeX \ Document, although you would still want me to put them in a table, since ‘The Document’
 had them in a table. Let me try to do that.
 
-\vspace{10mm}
-\begin{figure}[htb]
-    \includegraphics[width=0.45\textwidth]{fig4.png}%
-    \hspace*{\fill}% induce some horizontal separation between images 1 and 2
-    \includegraphics[width=0.45\textwidth]{fig5.png}
-
+\vspace{5mm}
+\begin{table}[htb]
+    \caption{Table with images, finally}
     \includegraphics[width=0.45\textwidth]{fig5.png}%
-    \hspace*{\fill}% induce some horizontal separation between images 3 and 4
+    \hspace*{\fill}% induce some horizontal separation between images 1 and 2
     \includegraphics[width=0.45\textwidth]{fig4.png}
-\end{figure}
+
+    \includegraphics[width=0.45\textwidth]{fig4.png}%
+    \hspace*{\fill}% induce some horizontal separation between images 3 and 4
+    \includegraphics[width=0.45\textwidth]{fig5.png}
+\end{table}
 
 Now, that we have all the possible ways multiple images can be aligned in
 the table. We will conclude this document with the final section.
@@ -257,11 +272,11 @@ the table. We will conclude this document with the final section.
 \newpage
 
 \section*{Conclusion}
-This document comprehensively demonstrated the capabilities of \LaTeX \ as a
+This document comprehensively demonstrated the capabilities of \LaTeX as a
 document typesetting / desktop publishing package. We have used various
 font size / family settings, we have used verbatim to display Latex code
 in a latex document, image settings, sections, subsections, references using
-labels, mathematical equations, notations, use of  for creating
+labels, mathematical equations, notations, use of $\hat{a}\breve{A}\ddot{Y}dia\hat{a}\breve{A}\acute{Z}$ for creating
 a diagram / flowchart etc.  I hope this suffices the need of learning basic \LaTeX. I hope you also notice that the last section i.e. Conclusion on Page
 5 is unnumbered and displays the use of something.
 
