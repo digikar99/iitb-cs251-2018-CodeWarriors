@@ -1,3 +1,5 @@
+import java.util.concurrent.atomic.AtomicInteger;
+
 class MarketRunnable extends Thread  {
 	private Thread t;
 	private String threadName;
@@ -11,7 +13,7 @@ class MarketRunnable extends Thread  {
 	public void run() {
 		//System.out.println("Running " +  threadName );
 		for(int i=0; i<100000; i++){
-			ProducerConsumerFix.totalStock += updateValue;
+			ProducerConsumerFix.totalStock.addAndGet(updateValue);
 		}
 		// System.out.println("Thread " +  threadName + " exiting.");
 	}
@@ -27,21 +29,23 @@ class MarketRunnable extends Thread  {
 
 
 public class ProducerConsumerFix{
-	static int totalStock=0;
+	static AtomicInteger totalStock=new AtomicInteger(0);
 	public static void main(String[] args){
 		MarketRunnable producer = new MarketRunnable("producer", 1);
 		MarketRunnable consumer = new MarketRunnable("consumer", -1);
-		producer.start();
-		try {
-			producer.join();
-            
-        } catch (InterruptedException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-		consumer.start();
+		Thread t1 = new Thread(producer, "t1");
+		Thread t2 = new Thread(consumer, "t2");
 		
-		consumer.join();
+
+		t1.start();
+		t2.start();
+		try{
+			t1.join();
+			t2.join();
+		}catch(InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+        }
 		
 		System.out.println(totalStock);
 	}
