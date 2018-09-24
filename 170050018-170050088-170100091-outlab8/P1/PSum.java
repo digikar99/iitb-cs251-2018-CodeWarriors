@@ -33,7 +33,6 @@ public class PSum{
 	public static int final_answer;
 	static int n_ele, n, p;
 	// p - number of elements to sum;
-	// n - abstract!
 	static Thread[] t;
 	public static int debug_level;
 	public static void reduce(){
@@ -75,17 +74,6 @@ public class PSum{
 				System.err.println("Reduction step " + Integer.toString(n_ele));
 		}
 
-		/*
-		Summer summer = new Summer(0, p, -1);
-		Thread t_final = new Thread(summer);
-		t_final.start();
-		try{
-			t_final.join();
-		}catch(InterruptedException e) {
-			e.printStackTrace();
-		}
-		*/
-		System.out.println(post_ans[0]);
-		
+		System.out.println(post_ans[0]);		
 	}
 }

@@ -1,0 +1,2 @@
+parallel: 0.177s
+sequential: 0.096s
