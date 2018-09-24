@@ -8,18 +8,17 @@ public class  FrequencyCollection
 {   
     public static void main(String[] args) 
     {    
-        //Creating wordCountMap which holds words as keys and their occurrences as values
          
         HashMap<String, Integer> wordCountMap = new HashMap<String, Integer>();
 
         ArrayList<String> stop_words= new ArrayList<>(Arrays.asList("and","the","is","in","at","of","his","her","him"));
-     
+
+        ArrayList<String> word_list= new ArrayList<>();
+
         BufferedReader reader = null;
          
         try
         {
-            //Creating BufferedReader object
-             
             reader = new BufferedReader(new FileReader(args[0]));
              
             //Reading the first line into currentLine
@@ -36,47 +35,43 @@ public class  FrequencyCollection
                  
                 for (String word : words)
                 {
-                    //if word is already present in wordCountMap, updating its count
-                    if(!stop_words.contains(word))
-                    {
-	                    if(word.isEmpty())
-	                    {
-	                    	continue;
-	                    }
-	                     
-	                    else if(wordCountMap.containsKey(word))
-	                    {    
-	                        wordCountMap.put(word, wordCountMap.get(word)+1);
-	                    }
-	                     
-	                    //otherwise inserting the word as key and 1 as its value
 
-	                    else
-	                    {
-	                        wordCountMap.put(word, 1);
-	                    }
-	                }
+                	 if(word.isEmpty())
+	                 {
+	                    	continue;
+	                 }
+                    else if(!stop_words.contains(word))
+                    {
+                    	word_list.add(word);
+                    }
                 }
-                 
-                //Reading next line into currentLine
-                 
                 currentLine = reader.readLine();
             }
 
+            TreeMap<String,Integer> map = new TreeMap<>();
 
-            //Set<Entry<String, Integer>> entrySet = wordCountMap.entrySet();
+            for(String word : word_list)
+            {
+            	//if word is already present in map, updating its count
+            	if(map.containsKey(word))
+                {    
+                    map.put(word, map.get(word)+1);
+                }
 
-            TreeMap<String,Integer> map = new TreeMap<>(wordCountMap);
+                else
+                {
+                	map.put(word,1);
+                }
 
+            }
             map.forEach((k,v) -> System.out.println(k + "," + v));
-             
-            // for (Entry<String, Integer> entry : entrySet)
-            // {
-            //     System.out.println(entry.getKey() + "," + entry.getValue());
-            // }
-             
-        }
+        }     
+         
         catch (IOException e) 
+        {
+            e.printStackTrace();
+        }
+        catch(NullPointerException e)
         {
             e.printStackTrace();
         }
