@@ -29,7 +29,7 @@ public class  FrequencyCollection
             {    
                 //splitting the currentLine into words
                  
-                String[] words = currentLine.toLowerCase().split(" ");
+                String[] words = currentLine.toLowerCase().split(" |\\t");
                  
                 //Iterating each word
                  
