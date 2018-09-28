@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Box8Clone</string>
+    <string name="email_field">Email Id</string>
+    <string name="password">Password</string>
+    <string name="post_address">Postal Address</string>
+    <string name="order_option_1">Biryani</string>
+    <string name="order_option_2">Wrap</string>
+    <string name="order_option_3">Desserts</string>
+    <string name="send">Submit</string>
+</resources>
