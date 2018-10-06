@@ -1,0 +1,7 @@
+1. Webclient - read data (at least, the key) from local storage; en/decrypt it; send it to the server
+
+2. Database - on the server, and responding to the client requests; sends data back to other clients (sync); setting up the database
+
+3. Linux Client (CLI) - Observes the directories on the client, encrypts and uploads data to the server; retrieves data from the server and decrypts it.
+
+4. Favourably common libraries / frameworks for webclient and linux client: fixing compatible tools
