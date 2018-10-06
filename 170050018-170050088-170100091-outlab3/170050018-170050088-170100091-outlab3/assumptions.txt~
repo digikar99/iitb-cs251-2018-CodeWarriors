@@ -1,9 +1,0 @@
-P3:
-  snakes.txt is in P3 directory
-
-P5:
-  
-  That the path to the file containing the two complex numbers is
-  supplied to the program as a commandline argument.
-
-  3.0+4.0i is treated the same as 3+4i
