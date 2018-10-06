@@ -1,0 +1,5 @@
+P2 Task 3: getloc.py works as expected, except for the fact that there is an extra space in "People currently in space:  6".
+
+
+
+

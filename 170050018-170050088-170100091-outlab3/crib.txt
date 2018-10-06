@@ -1,0 +1,8 @@
+P1 (task 1 and 2) - 0/10 marks have been awarded for both - We had also submitted [a different] data.txt in a hurry;  we assumed you would overwrite it - if you didn't, some of us can even put *** in data.txt and read it directly!. 
+The error might be because of the different data.txt in our directory. With the data.txt as given as example in the proble statement the code runs and works as expected. 
+
+P4 - Task 3 - 5/10 marks - As stated here (https://moodle.iitb.ac.in/mod/forum/discuss.php?d=90030#p137050), we have assumed that both s1 and s2 will be in students.txt. For the test case "0 4 4 4" as given here(https://moodle.iitb.ac.in/mod/forum/discuss.php?d=93747#p144139) (4,4) is not in the students.txt (given in the problem statement); and therefore, is wrong/invalid.
+
+P5 -  25/30 - We presume that the discrepancy in marks is due to the __truediv__ method. We may not be given marks because the final answer after division is a floating point number with high precision. As stated here, https://moodle.iitb.ac.in/mod/forum/discuss.php?d=93747#p144357, we should be given marks for division. 
+
+Or please let us know why the marks have been cut.
