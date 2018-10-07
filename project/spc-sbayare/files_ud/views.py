@@ -8,14 +8,15 @@ def index(request): # [1]
     '''
     Sends the contents of file_name as response
     '''
-    file_name = 'in.txt'
-    response = HttpResponse(content_type='application/force-download')
-    # There are some limitations to smart_str
-    response['Content-Disposition'] = 'attachment; filename=%s' % smart_str(file_name)
-    response['X-Sendfile'] = smart_str(file_name)
+    # file_name = 'in.txt'
+    # response = HttpResponse(content_type='application/force-download')
+    # # There are some limitations to smart_str
+    # response['Content-Disposition'] = 'attachment; filename=%s' % smart_str(file_name)
+    # response['X-Sendfile'] = smart_str('./'+file_name)
     # It's usually a good idea to set the 'Content-Length' header too.
     # You can also set any other required headers: Cache-Control, etc.
-    return response
+    with open('in.txt') as f:
+        return HttpResponse(f.read())
 
 
 '''
