@@ -10,12 +10,13 @@ cur = conn.cursor()
 
 typeof = dict()
 typeof['dob'] = 'timestamp'
-typeof['team_name'] = 'text'
 typeof['bowling_skill'] = 'text'
 typeof['win_type'] = 'text'
 typeof['batting_hand'] = 'text'
 typeof['role_desc'] = 'text'
 typeof['out_type'] = 'text'
+typeof['toss_winner'] = 'text'
+typeof['match_winner'] = 'text'
 
 def gto(field_name): # get_type_of
     if field_name in typeof:
