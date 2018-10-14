@@ -1,15 +1,19 @@
 #!/usr/bin/python3
 
 import sqlite3
-import sys
 
 mydb=sqlite3.connect('ipl.db')
 
 cur=mydb.cursor()
 
-arguments=sys.argv[1].split("\n")
+arguments=list(input())
+
+no_arguments=[2,6,15,7,11]
 
 table_no=int(arguments[0])
+
+for i in range(no_arguments[table_no-1]):
+	arguments.append(input())
 
 TABLES=["TEAM","PLAYER","MATCH","PLAYER_MATCH","BALL_BY_BALL"]
 
