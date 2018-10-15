@@ -10,7 +10,6 @@ FNAME = {1: 'team_name', 2:'player_name', 3:'match_id'}
 table = TABLE[int(sys.argv[1])]
 field_name = FNAME[int(sys.argv[1])]
 
-isVulnerable = (True if (sys.argv[2]=='1') else False)
 if (log_level>0) and not (sys.argv[2]=='1' or sys.argv[1]=='0'):
     print("Second argument is not 0 or 1:", sys.argv[2], file=sys.stderr)
 
@@ -25,7 +24,7 @@ def executeVulnerably():
 def executeWithCheck():
     cur.execute("delete from " + table + " where " + field_name + " = (?)", (sys.argv[3],))
 
-executeVulnerably() if isVulnerable else executeWithCheck()
+executeVulnerably() if sys.argv[2]=='0' else executeWithCheck()
 
 conn.commit()
 conn.close()
