@@ -25,6 +25,6 @@ else:
 	for i in range(9):
 		print(str(j[i][0]) + ',' + str(j[i][1]) + ',' + str(j[i][2]))
 	i = 9
-	while i<len(j) and j[9][1] == j[i][1]:
+	while i<len(j) and j[9][2] == j[i][2]:
 		print(str(j[i][0]) + ',' + str(j[i][1]) + ',' + str(j[i][2]))
 		i+=1
