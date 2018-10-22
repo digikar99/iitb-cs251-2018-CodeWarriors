@@ -1,7 +1,7 @@
 # Django:
 
 To install Django:
-    sudo python3 -m pip install Django
+    python3 -m pip install django
 
 [Learn with the tutorial.](https://docs.djangoproject.com/en/2.1/intro/tutorial01/)
 
@@ -27,3 +27,11 @@ In addition, you may need to refer [this](https://stackoverflow.com/questions/43
 
 [Learn markdown - Atlassian](https://confluence.atlassian.com/bitbucketserver/markdown-syntax-guide-776639995.html)
 
+
+# Dependencies
+
+Might be incomplete: django, django-cors-headers, curl, jq: (You may want to install the python modules in a system wide location by running the first two commands as sudo.)
+    python3 -m pip install django
+    python3 -m pip install django-cors-headers
+    sudo apt install curl
+    sudo apt install jq
