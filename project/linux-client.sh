@@ -7,13 +7,15 @@
 3. Upload the json object
 '
 
+NUM_FILES="$?"
+
 ####################################################################
 
 # 1. Authenticate
 # Reference: https://stackoverflow.com/questions/21306515/how-to-curl-an-authenticated-django-app
 
 LOGIN_URL=http://127.0.0.1:8000/accounts/login/
-YOUR_USER='mathews1'
+YOUR_USER='mathews'
 YOUR_PASS='1234'
 COOKIES=cookies.txt
 CURL_BIN="curl -s -c $COOKIES -b $COOKIES -e $LOGIN_URL"
@@ -30,9 +32,11 @@ $CURL_BIN \
 # echo -n " do something while logged in ..."
 $CURL_BIN \
     -d "$DJANGO_TOKEN&..." \
-    -X POST https://yourdjangowebsite.com/whatever/
+    -X POST https://127.0.0.1:8000/whatever/
 
 ##########################################################################
+
+if [ "$NUM_FILES" = "0" ]; then exit; fi
 
 # 2. Determine file type, get file contents, name and type in a json object
 FILE=$(realpath "$1")
