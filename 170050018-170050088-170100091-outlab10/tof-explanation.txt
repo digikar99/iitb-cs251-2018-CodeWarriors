@@ -1,1 +1,0 @@
-10.	match_id, striker, non-striker, bowler 

@@ -12,8 +12,8 @@ cur.execute('''SELECT PLY.player_id,PLY.player_name,
 	(SELECT COUNT(DISTINCT(BALL_BY_BALL.match_id)) FROM BALL_BY_BALL
 			WHERE PLY.player_id=BALL_BY_BALL.striker) AS avg_runs
 	FROM PLAYER AS PLY 
-	WHERE (SELECT COUNT(PLAYER_MATCH.match_id) FROM PLAYER_MATCH
-			 WHERE PLAYER_MATCH.player_id=PLY.player_id) <> 0 
+	WHERE (SELECT COUNT(DISTINCT(BALL_BY_BALL.match_id)) FROM BALL_BY_BALL
+			WHERE PLY.player_id=BALL_BY_BALL.striker) <> 0 
 			 ORDER BY avg_runs DESC''')
 
 j=cur.fetchall()
