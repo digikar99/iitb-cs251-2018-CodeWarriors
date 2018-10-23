@@ -24,16 +24,26 @@ while getopts ':hu:' option; do
 	   ;;
 	u) file=$OPTARG
 	   ;;
-	:) printf "missing argument for -%u\n" "$OPTARG" >&2
+	:) printf "missing argument for -$OPTARG\n" >&2
 	   echo "$usage" >&2
 	   exit 1
 	   ;;
-	\?) printf "illegal option:-%u\n" "$OPTARG" >&2
-	    echo "$usage" >$2
+	?) printf "illegal option: $OPTARG\n" >&2
+	    echo "$usage" >&2
 	    exit 1
 	    ;;
     esac
 done
+
+# exit if no options supplied
+if [ -z "$file" ]; then echo "$usage"; exit; fi
+path=$(realpath "$file")
+if ! [[ $path =~ /home/shubhamkar/SPC* ]]
+then
+    echo "$file should be inside $HOME/SPC/"
+    exit 1
+fi
+
 
 ####################################################################
 
@@ -56,7 +66,7 @@ fi
 
 django_token="csrfmiddlewaretoken=$(grep csrftoken $cookies | sed 's/^.*csrftoken\s*//')"
 
-echo $django_token
+# echo $django_token
 
 # echo -n " perform login ..."
 $curl_bin \
@@ -70,17 +80,10 @@ $curl_bin \
 
 ##########################################################################
 
-if [ "$log_level" > "0" ]; then echo Connection established; fi
-
-# if [ "$num_file" = "0" ]
-# then
-#     if [ "$log_level" > "0" ]; then echo "$num_file"; fi
-#     exit 1
-# fi
-
+if [ "$log_level" > "0" ]; then echo "Logged in..." ; fi
 
 # 2. Determine file type, get file contents, name and type in a json object
-file=$(realpath "$1")
+# file=$(realpath "$1") # has been obtained in part 0 already
 spc_root="/home/$USER/SPC/"
 # get file name wrt to the spc root
 name=$(echo ${file#$spc_root}) # is echo necessary?
@@ -90,16 +93,15 @@ type=""
 # Reference: https://stackoverflow.com/questions/12524437/output-json-from-bash-script
 json_obj="{\"name\":\""$name"\", \"content\":\""$content"\", \"type\":\""$type"\"}"
 
-echo The following will be sent: $json_obj
+printf "\nThe following will be sent: \n$json_obj\n"
 
 ########################################################################
 # 3. Send json object to the server
 
-echo
-echo Attempting to upload...
+printf "\nAttempting to upload...\n"
 
 upload_url="http://0.0.0.0:8080/upload_file/"
-cookie="cookie2.txt"
+# cookie="cookie2.txt" # cookie is unused
 
 # curl -v -c $cookie -b $cookie "$upload_url"
 # django_token="csrfmiddlewaretoken=$(grep csrftoken $cookie | sed 's/^.*csrftoken\s*//')"

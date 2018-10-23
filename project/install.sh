@@ -28,7 +28,7 @@ else
 	echo "$HOME/bin/iitb-spc not overwritten. Run ./install.sh again if you wanted to overwrite it."
 	exit 0
     fi
-    rm $HOME/bin/iitb-spc
+    rm "$HOME/bin/iitb-spc"
     ln -s "$to_path" "$HOME/bin/iitb-spc"
 fi
 
