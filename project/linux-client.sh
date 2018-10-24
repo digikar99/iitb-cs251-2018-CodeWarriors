@@ -38,7 +38,7 @@ done
 # exit if no options supplied
 if [ -z "$file" ]; then echo "$usage"; exit; fi
 path=$(realpath "$file")
-if ! [[ $path =~ /home/shubhamkar/SPC* ]]
+if ! [[ $path =~ $HOME/SPC* ]]
 then
     echo "$file should be inside $HOME/SPC/"
     exit 1
@@ -52,7 +52,7 @@ fi
 
 login_url=http://127.0.0.1:8000/accounts/login/
 your_user='mathews'
-your_pass='1234'
+your_pass='12345'
 cookies=cookies.txt
 curl_bin="curl -s -c $cookies -b $cookies -e $login_url"
 
