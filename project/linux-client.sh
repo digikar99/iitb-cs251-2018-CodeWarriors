@@ -105,7 +105,7 @@ upload_url="http://127.0.0.1:8000/upload_file/"
 # echo Django token: $django_token
 
 $curl_bin \
-    -d "$django_token&..." \
+    -d "$json_obj" \
     -X POST "$upload_url"
 
 # curl -v -c $cookie -b $cookie "$upload_url"
