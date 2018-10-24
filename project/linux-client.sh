@@ -70,8 +70,7 @@ django_token="csrfmiddlewaretoken=$(grep csrftoken $cookies | sed 's/^.*csrftoke
 
 # echo -n " perform login ..."
 $curl_bin \
-    -d "$django_token&username=$your_user&password=$your_pass" \
-    -X POST $login_url
+    -d "$django_token&username=$your_user&password=$your_pass" -X POST $login_url
 
 # echo -n " do something while logged in ..."
 # $curl_bin \
@@ -100,8 +99,14 @@ printf "\nThe following will be sent: \n$json_obj\n"
 
 printf "\nAttempting to upload...\n"
 
-upload_url="http://0.0.0.0:8080/upload_file/"
+upload_url="http://127.0.0.1:8000/upload_file/"
 # cookie="cookie2.txt" # cookie is unused
+
+# echo Django token: $django_token
+
+$curl_bin \
+    -d "$django_token&..." \
+    -X POST "$upload_url"
 
 # curl -v -c $cookie -b $cookie "$upload_url"
 # django_token="csrfmiddlewaretoken=$(grep csrftoken $cookie | sed 's/^.*csrftoken\s*//')"
@@ -111,15 +116,10 @@ upload_url="http://0.0.0.0:8080/upload_file/"
 # pload_url"
 
 # curl "$upload_url"
-curl --header "Content-Type: application/json" \
-     --request POST \
-     --data "$json_obj" \
-     "$upload_url"
-  
-
-
-# echo " logout"
-# rm $cookies
+# curl --header "Content-Type: application/json" \
+#      --request POST \
+#      --data "$json_obj" \
+#      "$upload_url"
 
 
 
