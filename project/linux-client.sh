@@ -52,7 +52,7 @@ fi
 
 login_url=http://127.0.0.1:8000/accounts/login/
 your_user='mathews'
-your_pass='12345'
+your_pass='123fgg4'
 cookies=cookies.txt
 curl_bin="curl -s -c $cookies -b $cookies -e $login_url"
 
