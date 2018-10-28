@@ -11,7 +11,7 @@ def colorcode(x,y,z,a,b,c):
 
 a=1
 b=1
-c=1
+c=-3.5
 with open('3dpd.out') as f:
 	filereader=csv.reader(f)
 	for row in filereader:
