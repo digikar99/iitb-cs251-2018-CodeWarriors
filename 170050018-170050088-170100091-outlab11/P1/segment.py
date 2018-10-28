@@ -37,22 +37,35 @@ argmin_to_feature = [[0,0,0], # sea
                      [128,128,128], # vegetation
                      [255,255,255]] # builtup
 
-def map_to_feature(pix):
-    dist = []
-    if (sys.argv[1] == 'eu'):
-        for i in range(4):
-            dist.append(ss.distance.euclidean(pix,mean_pixel[i]))
-    elif (sys.argv[1] == 'man'):
-        for i in range(4):
-            dist.append(ss.distance.cityblock(pix,mean_pixel[i]))
-    return argmin_to_feature[np.argmin(dist)]
+dist=[]
+if (sys.argv[1] == 'eu'):
+    for feature in mean_pixel:
+        diff = main - feature
+        sq = np.multiply(diff,diff)
+        eu_sum = np.sum(sq,2)
+        dist.append(np.sqrt(eu_sum))
+elif (sys.argv[1] == 'man'):
+    for feature in mean_pixel:
+        diff = main - feature
+        dist.append(np.sum(np.abs(diff),2))
+
+fin = main
+#print(len(dist[0]))
+        
+def map_to_feature(i,j):
+    #print(i,j)
+    min_ind = np.argmin([dist[0][i][j],
+                         dist[1][i][j],
+                         dist[2][i][j],
+                         dist[3][i][j]])
+    #print(min_ind)
+    return argmin_to_feature[min_ind]
 
 (x_max,y_max, z) = np.shape(main)
-#print(np.size(main))
 for i in range(x_max):
-#    print(i)
-    for j in range(y_max):
-        main[i][j] = map_to_feature(main[i][j])
+#   print(i)
+     for j in range(y_max):
+         main[i][j] = map_to_feature(i,j)
 
 filename=''
 if (sys.argv[1] == 'eu'):
