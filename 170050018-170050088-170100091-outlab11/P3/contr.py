@@ -73,6 +73,8 @@ topics=[]
 
 for i in l2:
 	topics.append(i[0])
+plt.ylabel('entropy')
+plt.xlabel('Topics')
 
 plt.xticks(ind, topics,rotation='vertical')
 
