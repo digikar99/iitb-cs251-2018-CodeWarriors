@@ -17,7 +17,7 @@ with open('3dpd.out') as f:
 		x=float(row[0])
 		y=float(row[1])
 		z=float(row[2])
-		if colorcode(a,z,0):
+		if colorcode(a,z,b):
 			ax.scatter(x,y,z,c='r')
 		else:
 			ax.scatter(x,y,z,c='b')
