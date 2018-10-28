@@ -10,7 +10,7 @@ def colorcode(a,z,b):
 	return a*z+b>=0
 
 a=1
-b=0
+b=-1
 with open('3dpd.out') as f:
 	filereader=csv.reader(f)
 	for row in filereader:
