@@ -34,13 +34,15 @@ for i in range(len(r_li[0])):
 		a.append(j[i])
 	pl_list.append(a)
 
-p1 = plt.bar(ind, pl_list[0],color='r')
-p2 = plt.bar(ind, pl_list[1],bottom=pl_list[0],color='b')
-p3 = plt.bar(ind, pl_list[2],bottom=np.array(pl_list[1])+np.array(pl_list[0]),color='g')
-p4 = plt.bar(ind, pl_list[3],bottom=np.array(pl_list[1])+np.array(pl_list[0])\
+width=0.50
+
+p1 = plt.bar(ind, pl_list[0],width,color='r')
+p2 = plt.bar(ind, pl_list[1],width,bottom=pl_list[0],color='b')
+p3 = plt.bar(ind, pl_list[2],width,bottom=np.array(pl_list[1])+np.array(pl_list[0]),color='g')
+p4 = plt.bar(ind, pl_list[3],width,bottom=np.array(pl_list[1])+np.array(pl_list[0])\
  + np.array(pl_list[2]) , color='c')
 
-
+plt.yticks(np.arange(0,21,1))
 topics=[]
 
 for i in head[1:]:

@@ -59,6 +59,7 @@ for j,i in enumerate(r_li):
 	re_list.append([head[1+j],entropy(i)])
 
 l2=[];
+width=0.50
 
 for i in sorted(re_list,key=lambda x: x[1]):
 	l2.append(i)
@@ -68,7 +69,7 @@ l3=[]
 for i in l2:
 	l3.append(i[1])
 
-p1 = plt.bar(ind,l3 ,color='b')
+p1 = plt.bar(ind,l3,width, color='b')
 topics=[]
 
 for i in l2:
