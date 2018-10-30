@@ -25,7 +25,7 @@ SECRET_KEY = 'ys4#15edn(m4%jp%!%t74kqxwu!+p2u(w)dns#b*vrmrq-3(*x'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 CORS_ORIGIN_ALLOW_ALL=True
 

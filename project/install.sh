@@ -32,6 +32,7 @@ else
     ln -s "$to_path" "$HOME/bin/iitb-spc"
 fi
 
+echo
 echo "Currently, we haven't included set up additional necessary tools."
 echo "Fun Fact: Entering spc in bash suggests installing supercat."
     
