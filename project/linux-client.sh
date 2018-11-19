@@ -202,10 +202,14 @@ enc() {
     if [ $method = "rsa" ]; then
 	openssl
     else
-	
+	unset -v key iv
+	for var in key iv; do
+	    IFS= read -r "$var" || break
+	done < $key_file
+	# Reference: https://unix.stackexchange.com/questions/339992/how-to-read-different-lines-of-a-file-to-different-variables
 	# echo Key: $key
 	# echo IV: $iv
-	openssl enc $method -k $key -iv $iv -nosalt -a -in "$1"
+	openssl enc $method -K $key -iv $iv -nosalt -a -in "$1"
 
     fi
 	
