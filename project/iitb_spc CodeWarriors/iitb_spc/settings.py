@@ -28,6 +28,7 @@ DEBUG = True
 ALLOWED_HOSTS = [
     '10.42.0.1', # running wifi-hotspot on shubhamkar's laptop
     '127.0.0.1', # default local access
+    '10.196.12.93', # running connected with IITB-Wireless
 ]
 
 
@@ -41,6 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'accounts',
+    'upload_file',
 ]
 
 MIDDLEWARE = [
@@ -121,6 +123,10 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
-STATIC_URL = '/static/'
+STATIC_URL = '/webclient/'
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, "webclient")
+]
+# STATIC_ROOT = '/webclient/'
 
 LOGIN_REDIRECT_URL = '/home/'

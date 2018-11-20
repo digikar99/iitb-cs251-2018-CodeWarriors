@@ -16,10 +16,13 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from django.conf.urls import url
+from django.conf.urls.static import static
+from django.conf import settings
+from django.contrib.auth import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('upload_file/', include('upload_file.urls')),
+    path('', views.LoginView.as_view()),
     path('', include('accounts.urls')), # all the urls in accounts section
-
-#    path('accounts/login', accounts.urls)
-]
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

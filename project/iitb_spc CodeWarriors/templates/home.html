@@ -8,6 +8,7 @@
 {% if user.is_authenticated %}
   Hi {{ user.username }}!
     {{user.id}}
+    <a href="/upload_file">Upload</a>
     <div>
     	<p>Choose Encryption Algorithm</p>
     	<select name="algo" id='algo'>

@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block title %}Uploads Page{% endblock %}
+
+{% block content %}
+{% if user.is_authenticated %}
+  Hi {{ user.username }}!
+ <form action="file_upload/" method="post"> {% csrf_token %}
+  File Name:<br>
+  <input id="filename" type="text" name="filename"><br>
+  File Content:<br>
+  <input id="filecontent" type="file" name="filecontent">
+   <input type="submit" value="Submit">
+ </form>
+ {% else %}
+  <p>You are not logged in</p>
+  <a href="{% url 'login' %}">login</a>
+{% endif %}
+{% endblock %}
