@@ -12,7 +12,11 @@
 #set -x
 arg_list="$@"
 log_level=1 # in addition, see "exit 1" in authenticate
-login_url="127.0.0.1:8000/accounts/login"
+host="127.0.0.1:8000/"
+login_url="$hostlogin/"
+upload_url="$hostupload_url/"
+cookies=~/.config/iitb-spc/.cookies
+auth_file=~/.config/iitb-spc/.auth
 usage="$(basename "$0") command-line interface 
 
 Commands:
@@ -51,7 +55,7 @@ main() {
 }
 
 config() {
-    auth_file=~/.config/iitb-spc/.auth
+    
     printf "Change username and password: (Press Ctrl+C to cancel this action.)\n"
     read -p "Username: " user 
     read  -p "Password: " -s pass 
@@ -71,16 +75,16 @@ config() {
 
 authenticate() {
     # Reference: https://stackoverflow.com/questions/21306515/how-to-curl-an-authenticated-django-app
-    if [ ! -f ~/.config/iitb-spc/.auth ]; then
-	printf "No ~/.config/iitb-spc/.auth file found.\n"
+    if [ ! -f $auth_file ]; then
+	printf "No $auth_file file found.\n"
 	config
     fi
-    read user pass  < ~/.config/iitb-spc/.auth
+    read user pass  < $auth_file
     if [ "$log_level" -gt "0" ] ; then
 	echo Username: $user
 	echo Password: $pass
     fi
-    cookies=~/.config/iitb-spc/.cookies
+
     curl_bin="curl -s -c $cookies -b $cookies -e $login_url"
 
     # echo -n "Django Auth: get csrftoken ..."
@@ -93,7 +97,9 @@ authenticate() {
 
     django_token="csrfmiddlewaretoken=$(grep csrftoken $cookies | sed 's/^.*csrftoken\s*//')"
 
-    # echo $django_token
+    if [ "$log_level" -gt "0" ]; then
+	echo django token for login page: $django_token
+    fi
 
     # echo -n " perform login ..."
     $curl_bin \
@@ -182,12 +188,34 @@ upload_file(){
 	echo $1 is a symlink. It may break on other devices.
 	printf "  Uploading $1 still..\n"
     elif [ -f "$1" ]; then
+	spc_root="/home/$USER/SPC/"
+	# get file name wrt to the spc root
+	name=$(echo ${file#$spc_root}) # is echo necessary?
+	type=""
 	echo Uploading $1...
 	#enc "$1"
-	enc_data=$(enc "$1")
+	content=$(enc "$1")
 	if [ "$log_level" -gt "0" ]; then
 	    echo =================================
-	    echo $1 encrypted: $enc_data; fi
+	    echo $1 encrypted: $content;
+	fi
+
+	curl_bin="curl -s -c $cookies -b $cookies -e $upload_url"
+	$curl_bin $login_url > /dev/null
+	if [ ! -f "$cookies" ]
+	then
+	    echo "No cookies file found. Is the server running?"
+	    # exit 1 # comment only for testing
+	fi
+
+	django_token="csrfmiddlewaretoken=$(grep csrftoken $cookies | sed 's/^.*csrftoken\s*//')"
+	
+	if [ "$log_level" -gt "0" ]; then
+	    echo django token for upload page: $django_token
+	fi
+	$curl_bin \
+	    -d "$django_token&filename=$name&filecontent=$content" \
+	    -X POST "$upload_url"
     else
 	echo $1 is not a regular file or a symlink.
 	printf "  Uploading it as an empty file...\n"
