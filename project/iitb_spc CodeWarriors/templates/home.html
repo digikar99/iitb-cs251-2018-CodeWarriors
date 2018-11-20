@@ -8,6 +8,29 @@
 {% if user.is_authenticated %}
   Hi {{ user.username }}!
     {{user.id}}
+    <div>
+    	<p>Choose Encryption Algorithm</p>
+    	<select name="algo" id='algo'>
+    	  <option value="aes">AES 192 CBC</option>
+    	  <option value="des">Triple DES (192)</option>
+    	  <option value="rsa">RSA</option>
+    	</select>
+    	<p>Note: Choosing the wrong algorithm will cause a garbage file to be displayed.</p>
+    </div>
+    <div>
+    	<p id="dec-key-cache"></p>
+    	<p>Choose decryption-key file.</p>
+    	<input type="file" id="dec-key">
+    	<button id="load-key">Load Decryption Keys</button>
+    </div>
+    <div>
+    	<p>Upload encrypted file. Note: This is to be used only for testing purposes.</p>
+    	<input type="file" id="enc-file">
+    	<button id="load-enc-file">Load Encrypted File</button>
+    	<embed id='pdf'></embed>
+    	<a id="download-anchor" href="data:application/octet-stream;charset=utf-16le;base64,aGVsbG8gd29ybGQK">text file</a>
+    </div>
+    
 {% else %}
   <p>You are not logged in</p>
   <a href="{% url 'login' %}">login</a>
@@ -17,4 +40,5 @@
 {% block js %}
 {% load static %}
 <script src="{% static 'webclient.js' %}"></script>
+
 {% endblock %}

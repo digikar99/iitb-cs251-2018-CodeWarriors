@@ -209,7 +209,7 @@ enc() {
 	# Reference: https://unix.stackexchange.com/questions/339992/how-to-read-different-lines-of-a-file-to-different-variables
 	# echo Key: $key
 	# echo IV: $iv
-	openssl enc $method -K $key -iv $iv -nosalt -a -in "$1"
+	openssl enc $method -K $key -iv $iv -nosalt -base64 -in "$1" | tr -d '\n'
 
     fi
 	
