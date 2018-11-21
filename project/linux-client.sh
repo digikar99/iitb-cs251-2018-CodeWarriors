@@ -11,10 +11,10 @@
 
 #set -x
 arg_list="$@"
-log_level=1 # in addition, see "exit 1" in authenticate
+log_level=0 # in addition, see "exit 1" in authenticate
 host="127.0.0.1:8000/"
-login_url="$hostlogin/"
-upload_url="$hostupload_url/"
+login_url="$host"'login/'
+upload_url="$host"'upload_file/'
 cookies=~/.config/iitb-spc/.cookies
 auth_file=~/.config/iitb-spc/.auth
 enc_file=~/.config/iitb-spc/.credentials
@@ -107,7 +107,6 @@ authenticate() {
     # echo -n " perform login ..."
     $curl_bin \
 	-d "$django_token&username=$user&password=$pass" -X POST $login_url
-
 }
 
 ende-change() {
@@ -152,7 +151,7 @@ sync() {
 }
 
 upload() {
-    echo In the case of a conflict, this will overwrite any file present on the server.
+    # echo In the case of a conflict, this will overwrite any file present on the server.
 #    shift # ignore the first arg
     if [ "$#" = "0" ]; then
 	echo "Do you want to do this for all the files? ([y]/n)"
@@ -162,10 +161,10 @@ upload() {
     item="$1" # handles a single file or folder
     if [ -d "$item" ]; then
 	IFS=$'\n' # use new lines as field separators
-	file_list=$(find ~/SPC -not -type d)
-	for file in $file_list; do
+	subitem_list=$(find ~/SPC/"$item" -not -type d)
+	for subitem in $subitem_list; do
 	    #echo Uploading file $file ...
-	    upload_file "$file"
+	    upload_file "$subitem"
 	done
     else
 	upload_file "$item"
@@ -194,9 +193,11 @@ upload_file(){
 	    echo $1 encrypted:
 	    echo $content;
 	fi
-
+	
 	curl_bin="curl -s -c $cookies -b $cookies -e $upload_url"
-	$curl_bin $login_url > /dev/null
+	# echo curl_bin: $curl_bin $upload_url
+	first_curl_bin="curl -s -c $cookies -b $cookies -e $upload_url $upload_url"
+	$first_curl_bin > /dev/null
 	if [ ! -f "$cookies" ]
 	then
 	    echo "No cookies file found. Is the server running?"
@@ -209,7 +210,7 @@ upload_file(){
 	    echo django token for upload page: $django_token
 	fi
 	$curl_bin \
-	    -d "$django_token&filename=$name&filecontent=$content" \
+	    -d "$django_token&name_path=$name&file_data=$content" \
 	    -X POST "$upload_url"
     else
 	echo $1 is not a regular file or a symlink.
