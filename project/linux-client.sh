@@ -193,11 +193,10 @@ upload_file(){
 	    echo $1 encrypted:
 	    echo $content;
 	fi
-	
+
+	unset IFS
 	curl_bin="curl -s -c $cookies -b $cookies -e $upload_url"
-	# echo curl_bin: $curl_bin $upload_url
-	first_curl_bin="curl -s -c $cookies -b $cookies -e $upload_url $upload_url"
-	$first_curl_bin > /dev/null
+	$curl_bin $upload_url > /dev/null
 	if [ ! -f "$cookies" ]
 	then
 	    echo "No cookies file found. Is the server running?"
