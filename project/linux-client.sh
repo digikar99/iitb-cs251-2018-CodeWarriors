@@ -187,7 +187,8 @@ upload_file(){
     elif [ -f "$1" ]; then
 	spc_root="/home/$USER/SPC/"
 	# get file name wrt to the spc root
-	name=$(echo ${1#$spc_root}) # is echo necessary?
+	file=$(realpath "$1")
+	name=$(echo ${file#$spc_root}) # is echo necessary?
 	type=""
 	echo Uploading $name...
 	#enc "$1"

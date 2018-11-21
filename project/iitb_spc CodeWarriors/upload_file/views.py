@@ -22,5 +22,4 @@ class UploadFile(generic.CreateView):
     success_url = '/home'
     from django import forms
 
-        
     

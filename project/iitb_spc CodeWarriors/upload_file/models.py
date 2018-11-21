@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 # Create your models here.
 
 class File(models.Model):
-    owner = models.ForeignKey(User)
+    #owner = models.ForeignKey(blank=True,)
     name_path = models.TextField()
     file_data=models.TextField(blank=True, null=True)
     last_update_time = models.IntegerField()
