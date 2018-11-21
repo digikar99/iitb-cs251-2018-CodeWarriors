@@ -3,6 +3,7 @@ from django import forms
 from django.middleware import csrf
 from django.views import generic
 from . import models
+from django.shortcuts import redirect
 from django.contrib.auth.models import User
 
 class UploadFileForm(forms.ModelForm):
@@ -15,11 +16,16 @@ class UploadFileForm(forms.ModelForm):
     #     obj.owner = user
     #     obj.save()
     #     return obj
-
 class UploadFile(generic.CreateView):
     template_name='upload_file/file_upload.html'
     form_class=UploadFileForm # (initial={'owner':request.user.id})
-    success_url = '/home'
-    from django import forms
 
-    
+    def dispatch(self, *args, **kwargs):
+        return super(UploadFile, self).dispatch(*args, **kwargs)
+
+    def form_valid(self, form):
+        obj = form.save(commit=False)
+        obj.owner = self.request.user
+        obj.save()
+        return redirect(('/home'))
+
