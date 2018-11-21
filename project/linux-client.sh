@@ -104,7 +104,6 @@ authenticate() {
 	echo django token for login page: $django_token
     fi
 
-    # echo -n " perform login ..."
     $curl_bin \
 	-d "$django_token&username=$user&password=$pass" -X POST $login_url
 }
@@ -187,13 +186,13 @@ upload_file(){
     elif [ -f "$1" ]; then
 	spc_root="/home/$USER/SPC/"
 	# get file name wrt to the spc root
-	name=\"$(echo ${1#$spc_root})\" # is echo necessary?
-	type=\"\"
+	name=$(echo ${1#$spc_root}) # is echo necessary?
+	type=""
 	echo Uploading $name...
 	#enc "$1"
-	content=\"$(enc "$1")\"
+	content=$(enc "$1")
 	lut=$(stat -c %Z "$1") # last_update_time
-	md5=\"$(md5sum "$1")\"
+	md5=$(md5sum "$1")
 	if [ "$log_level" -gt "0" ]; then
 	    echo =================================
 	    echo name_path: $name
@@ -219,25 +218,18 @@ upload_file(){
 	fi
 	
 	token=\"$(grep csrftoken $cookies | sed 's/^.*csrftoken\s*//')\"
-	cat <<CURL
-{ 
-  "csrfmiddlewaretoken": $token, 
-  "name_path": $name, 
-  "file_data": $content, 
-  "last_update_time": $lut, 
-  "md5sum": $md5 
-}
-CURL
-	
-	$curl_bin "$upload_url" -v -H "application/x-www-form-urlencoded" -d @- <<CURL
-{ 
-  "csrfmiddlewaretoken": $token, 
-  "name_path": $name, 
-  "file_data": $content, 
-  "last_update_time": $lut, 
-  "md5sum": $md5 
-}
-CURL
+
+	$curl_bin "$upload_url" -X POST -d @- <<EOF
+$django_token&name_path=$name&file_data=$content&last_update_time=$lut&md5sum=$md5
+EOF
+	# $curl_bin "$upload_url" -d "$django_token" -X POST -d @- <<CURL
+# { 
+#   "name_path": $name, 
+#   "file_data": $content, 
+#   "last_update_time": $lut, 
+#   "md5sum": $md5 
+# }
+# CURL
 
 	
     else
