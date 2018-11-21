@@ -17028,7 +17028,7 @@ document.getElementById('load-enc-file').addEventListener("click", function(){
     reader.readAsText(file, "UTF-8");
     reader.onload = function(e) {
 	console.log('encrypted file loaded');
-	console.log(reader.result);
+	// console.log(reader.result);
 	console.log(typeof(reader.result));
 	file_data = reader.result;
 	console.log(file_data.length);
@@ -17056,29 +17056,33 @@ function decrypt_core_AES_CBC(key, iv, ciphertext) {
     return CryptoJS.enc.Base64.stringify(message);
 }
 
-function b64toBlob(b64Data, contentType) {
-    contentType = contentType || '';
-    var sliceSize = 512;
-    b64Data = b64Data.replace(/^[^,]+,/, '');
-    b64Data = b64Data.replace(/\s/g, '');
-    var byteCharacters = window.atob(b64Data);
-    var byteArrays = [];
+function decrypt_core_TripleDES_CBC(key, iv, ciphertext) {
+    // console.log(key);
+    // console.log(iv);
+    message = CryptoJS.TripleDES.decrypt({
+	ciphertext: ciphertext
+    }, key, {
+	iv: iv,
+	padding: CryptoJS.pad.NoPadding, 
+	mode: CryptoJS.mode.CBC
+    }); 
+    //console.log(message);
+    return CryptoJS.enc.Base64.stringify(message);
+}
 
-    for (var offset = 0; offset < byteCharacters.length; offset += sliceSize) {
-        var slice = byteCharacters.slice(offset, offset + sliceSize);
-
-        var byteNumbers = new Array(slice.length);
-        for (var i = 0; i < slice.length; i++) {
-            byteNumbers[i] = slice.charCodeAt(i);
-        }
-
-        var byteArray = new Uint8Array(byteNumbers);
-
-        byteArrays.push(byteArray);
-    }
-
-    var blob = new Blob(byteArrays, {type: contentType});
-    return blob;
+function decrypt_core_Camellia_CBC(key, iv, ciphertext) {
+    // there's no camellia module in cryptojs!!
+    // console.log(key);
+    // console.log(iv);
+    message = CryptoJS.Camellia.decrypt({
+	ciphertext: ciphertext
+    }, key, {
+	iv: iv,
+	padding: CryptoJS.pad.NoPadding, 
+	mode: CryptoJS.mode.CBC
+    }); 
+    //console.log(message);
+    return CryptoJS.enc.Base64.stringify(message);
 }
 
 function decryptFile(){
@@ -17092,27 +17096,30 @@ function decryptFile(){
 	file_type = 'pdf'
 	//file_data = '2DHTnGWbbw2onuMjTu2e9A=='
 	e = document.getElementById('algo');
-	if (e.options[e.selectedIndex].value == 'rsa'){
-	    console.log('rsa decryption is not yet ready');
-	} else {
-	    key = CryptoJS.enc.Hex.parse(localStorage['iitb-spc-dec-keys']
-					 .split(',')[0]);
-	    iv = CryptoJS.enc.Hex.parse(localStorage['iitb-spc-dec-keys']
-					.split(',')[1]);
-	    console.log(file_data.length);
-	    var ciphertext = CryptoJS.enc.Base64.parse(file_data);
-	    var dec = decrypt_core_AES_CBC(key, iv, ciphertext);
-	    console.log("decryption successful");
-	    console.log(typeof(dec));
-	    console.log(dec);
-	    document.getElementById('download-anchor').href
-		= "data:application/octet-stream;"
-		+ "charset=utf-16le;base64,"
-		+ dec; // assume application/octet-stream
-	    // + file_data.slice(28);
-
+	key = CryptoJS.enc.Hex.parse(localStorage['iitb-spc-dec-keys']
+				     .split(',')[0]);
+	iv = CryptoJS.enc.Hex.parse(localStorage['iitb-spc-dec-keys']
+				    .split(',')[1]);
+	console.log(file_data.length);
+	var ciphertext = CryptoJS.enc.Base64.parse(file_data);
+	var dec = ''
+	if (e.options[e.selectedIndex].value == 'aes'){
+	    dec = decrypt_core_AES_CBC(key, iv, ciphertext);
+	} else if (e.options[e.selectedIndex].value == '3des'){
+	    dec = decrypt_core_TripleDES_CBC(key, iv, ciphertext);
+	} else if (e.options[e.selectedIndex].value == 'camellia'){
+	    dec = decrypt_core_Camellia_CBC(key, iv, ciphertext);
 	}
-	
+	console.log("decryption successful");
+	console.log(typeof(dec));
+	// console.log(dec);
+	document.getElementById('download-anchor').href
+	    = "data:application/octet-stream;"
+	// = "data:application/mp4;" // for videos
+	    + "charset=utf-16le;base64,"
+	    + dec; // assume application/octet-stream
+	// + file_data.slice(28);
+
     } else {
 	console.log('No decryption keys found.');
     }

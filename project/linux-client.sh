@@ -17,6 +17,9 @@ login_url="$hostlogin/"
 upload_url="$hostupload_url/"
 cookies=~/.config/iitb-spc/.cookies
 auth_file=~/.config/iitb-spc/.auth
+enc_file=~/.config/iitb-spc/.credentials
+key_file=~/.config/iitb-spc/.privkey
+pub_key=~/.config/iitb-spc/.pubkey    
 usage="$(basename "$0") command-line interface 
 
 Commands:
@@ -30,7 +33,7 @@ Commands:
 "
 
 main() {
-    if [ "$log_level" -gt "0" ] ; then printf "$# argument(s): $*\n\n"; fi
+    if [ "$log_level" -gt "1" ] ; then printf "$# argument(s): $*\n\n"; fi
     if [ "$#" = "0" ] ; then
 	printf "$usage"; exit 1
     elif [ "$1" = "help" ]; then
@@ -59,7 +62,7 @@ config() {
     printf "Change username and password: (Press Ctrl+C to cancel this action.)\n"
     read -p "Username: " user 
     read  -p "Password: " -s pass 
-    if [ "$log_level" -gt "0" ] ; then
+    if [ "$log_level" -gt "1" ] ; then
 	printf "Username: $user\nPassword: $pass\n"
     else
 	echo
@@ -80,7 +83,7 @@ authenticate() {
 	config
     fi
     read user pass  < $auth_file
-    if [ "$log_level" -gt "0" ] ; then
+    if [ "$log_level" -gt "1" ] ; then
 	echo Username: $user
 	echo Password: $pass
     fi
@@ -97,7 +100,7 @@ authenticate() {
 
     django_token="csrfmiddlewaretoken=$(grep csrftoken $cookies | sed 's/^.*csrftoken\s*//')"
 
-    if [ "$log_level" -gt "0" ]; then
+    if [ "$log_level" -gt "1" ]; then
 	echo django token for login page: $django_token
     fi
 
@@ -108,30 +111,21 @@ authenticate() {
 }
 
 ende-change() {
-    enc_file=~/.config/iitb-spc/.credentials
-    key_file=~/.config/iitb-spc/.privkey
-    printf "Choose an encryptions scheme: \n 1. AES-CBC-256 \n 2. Triple DES "
-    printf "\n 3. RSA\n(Or press Ctrl+C to cancel.)\nEnter [1], 2 or 3: "
+    printf "Choose an encryptions scheme: \n 1. AES-CBC-192 \n 2. Triple DES 192 "
+    printf "\n 3. Camellia-CBC-192 (NOTE: Doesn't work in webclient.)\n(Or press Ctrl+C to cancel.)\nEnter [1], 2 or 3: "
     read choice
     if [ -z "$choice" ]; then choice=1; fi
-    # Note that AES 256 is much stronger than RSA 2048.
-    # AES is a standard - it is much tested than Triple DES.
-    # As such, it makes no sense to choose any other option than AES.
     touch $key_file
     if [ "$choice" = "1" ]; then
 	echo -aes-192-cbc > $enc_file
-	key=$(openssl rand -hex 24)
-	iv=$(openssl rand -hex 16)
-	printf "$key\n$iv\n" > $key_file
     elif  [ "$choice" = "2" ]; then
 	echo -des-ede3-cbc > $enc_file
-	key=$(openssl rand -hex 24)
-	iv=$(openssl rand -hex 16)
-	printf "$key\n$iv\n" > $key_file
     elif  [ "$choice" = "3" ]; then
-	echo rsa > $enc_file
-	openssl genrsa -out $key_file # private key
+	echo -camellia-192-cbc > $enc_file
     fi
+    key=$(openssl rand -hex 24)
+    iv=$(openssl rand -hex 16)
+    printf "$key\n$iv\n" > $key_file
 }
 
 sync() {
@@ -141,14 +135,14 @@ sync() {
 
     on_client=$(stat -c %Z "$1")
     difference=$(($on_client - $on_server))
-    if [ "$log_level" -gt "0" ]; then
+    if [ "$log_level" -gt "1" ]; then
 	on_server=$(stat -c %Z $HOME/SPC) # for testing purposes
 	echo Last update time on server: $on_server
 	echo Last update time on client: $on_client
 	difference=$(($on_client - $on_server))
 	echo $difference
     fi
-    if [ "$difference" -gt "0" ]; then
+    if [ "$difference" -gt "1" ]; then
 	upload "$2"
     else
 	download "$2"
@@ -196,8 +190,9 @@ upload_file(){
 	#enc "$1"
 	content=$(enc "$1")
 	if [ "$log_level" -gt "0" ]; then
-	    echo =================================
-	    echo $1 encrypted: $content;
+	    #echo =================================
+	    echo $1 encrypted:
+	    echo $content;
 	fi
 
 	curl_bin="curl -s -c $cookies -b $cookies -e $upload_url"
@@ -210,7 +205,7 @@ upload_file(){
 
 	django_token="csrfmiddlewaretoken=$(grep csrftoken $cookies | sed 's/^.*csrftoken\s*//')"
 	
-	if [ "$log_level" -gt "0" ]; then
+	if [ "$log_level" -gt "1" ]; then
 	    echo django token for upload page: $django_token
 	fi
 	$curl_bin \
@@ -223,24 +218,15 @@ upload_file(){
 }
 
 enc() {
-    #    cat $1 | openssl enc -aes-128-cbc -nosalt -a <<<
-    enc_file=~/.config/iitb-spc/.credentials
-    key_file=~/.config/iitb-spc/.privkey
     method=$(cat $enc_file)
-    if [ $method = "rsa" ]; then
-	openssl
-    else
-	unset -v key iv
-	for var in key iv; do
-	    IFS= read -r "$var" || break
-	done < $key_file
-	# Reference: https://unix.stackexchange.com/questions/339992/how-to-read-different-lines-of-a-file-to-different-variables
-	# echo Key: $key
-	# echo IV: $iv
-	openssl enc $method -K $key -iv $iv -nosalt -base64 -in "$1" | tr -d '\n'
-
-    fi
-	
+    unset -v key iv
+    for var in key iv; do
+	IFS= read -r "$var" || break
+    done < $key_file
+    # Reference: https://unix.stackexchange.com/questions/339992/how-to-read-different-lines-of-a-file-to-different-variables
+    # echo Key: $key
+    # echo IV: $iv
+    openssl enc $method -K $key -iv $iv -nosalt -base64 -in "$1" | tr -d '\n'	
 }
 
 main "$@"
