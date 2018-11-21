@@ -187,14 +187,13 @@ upload_file(){
     elif [ -f "$1" ]; then
 	spc_root="/home/$USER/SPC/"
 	# get file name wrt to the spc root
-	file=$(realpath "$1")
-	name=$(echo ${file#$spc_root}) # is echo necessary?
-	type=""
+	name=\"$(echo ${1#$spc_root})\" # is echo necessary?
+	type=\"\"
 	echo Uploading $name...
 	#enc "$1"
-	content=$(enc "$1")
+	content=\"$(enc "$1")\"
 	lut=$(stat -c %Z "$1") # last_update_time
-	md5=$(md5sum "$1")
+	md5=\"$(md5sum "$1")\"
 	if [ "$log_level" -gt "0" ]; then
 	    echo =================================
 	    echo name_path: $name
@@ -218,9 +217,29 @@ upload_file(){
 	if [ "$log_level" -gt "1" ]; then
 	    echo django token for upload page: $django_token
 	fi
-	$curl_bin \
-	    -d "$django_token&name_path=$name&file_data=$content&last_update_time=$lut&md5sum=$md5" \
-	    -X POST "$upload_url"
+	
+	token=\"$(grep csrftoken $cookies | sed 's/^.*csrftoken\s*//')\"
+	cat <<CURL
+{ 
+  "csrfmiddlewaretoken": $token, 
+  "name_path": $name, 
+  "file_data": $content, 
+  "last_update_time": $lut, 
+  "md5sum": $md5 
+}
+CURL
+	
+	$curl_bin "$upload_url" -v -H "application/x-www-form-urlencoded" -d @- <<CURL
+{ 
+  "csrfmiddlewaretoken": $token, 
+  "name_path": $name, 
+  "file_data": $content, 
+  "last_update_time": $lut, 
+  "md5sum": $md5 
+}
+CURL
+
+	
     else
 	echo $1 is not a regular file or a symlink.
 	printf "  Uploading it as an empty file...\n"
