@@ -11,7 +11,7 @@
 
 #set -x
 arg_list="$@"
-log_level=0 # in addition, see "exit 1" in authenticate
+log_level=2 # in addition, see "exit 1" in authenticate
 host="127.0.0.1:8000/"
 login_url="$host"'login/'
 upload_url="$host"'upload_file/'
@@ -159,9 +159,13 @@ upload() {
 	if [[ $response = "n" || $response = "N" ]]; then exit 0; fi
     fi
     item="$1" # handles a single file or folder
+    if [ "$item" = "." ]; then
+	item=$(pwd)
+	echo $item
+    fi
     if [ -d "$item" ]; then
 	IFS=$'\n' # use new lines as field separators
-	subitem_list=$(find ~/SPC/"$item" -not -type d)
+	subitem_list=$(find "$item" -not -type d)
 	for subitem in $subitem_list; do
 	    #echo Uploading file $file ...
 	    upload_file "$subitem"
@@ -183,15 +187,20 @@ upload_file(){
     elif [ -f "$1" ]; then
 	spc_root="/home/$USER/SPC/"
 	# get file name wrt to the spc root
-	name=$(echo ${file#$spc_root}) # is echo necessary?
+	name=$(echo ${1#$spc_root}) # is echo necessary?
 	type=""
-	echo Uploading $1...
+	echo Uploading $name...
 	#enc "$1"
 	content=$(enc "$1")
+	lut=$(stat -c %Z "$1") # last_update_time
+	md5=$(md5sum "$1")
 	if [ "$log_level" -gt "0" ]; then
-	    #echo =================================
-	    echo $1 encrypted:
-	    echo $content;
+	    echo =================================
+	    echo name_path: $name
+	    echo file_data: [not shown]
+	    echo last_update_time: $lut
+	    echo file_type: 
+	    echo md5sum: $md5
 	fi
 
 	unset IFS
@@ -209,7 +218,7 @@ upload_file(){
 	    echo django token for upload page: $django_token
 	fi
 	$curl_bin \
-	    -d "$django_token&name_path=$name&file_data=$content" \
+	    -d "$django_token&name_path=$name&file_data=$content&last_update_time=$lut&md5sum=$md5" \
 	    -X POST "$upload_url"
     else
 	echo $1 is not a regular file or a symlink.
