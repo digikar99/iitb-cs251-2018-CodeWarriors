@@ -1,43 +1,34 @@
 from django.shortcuts import render
-from django.http import HttpResponse
-import json
-from django.template import loader
-from server_side.models import Directory,File
-from django.http import StreamingHttpResponse
-from django.shortcuts import render
 from django import forms
 from django.middleware import csrf
+from django.views import generic
+from . import models
+from django.shortcuts import redirect
+from django.contrib.auth.models import User
 
-# def index(request):
-#     a=csrf.get_token(request)
-#     if request.method=='POST':
-#         json_data=json.loads(request.body.decode('utf-8'))
-#         current_user=request.user
-#         flag="fail"
-#         if current_user.is_authenticated:
-#             flag="sucess...\n" + " current user = " + str(current_user.username) + "\nuser-id=" + str(current_user.id)
-#             a=File(owner=current_user ,file_data=json_data['content'].encode())
-#         return HttpResponse(flag + ' : The following data was recieved by POST:\n'+str(json_data)+'\n')
-#     response = HttpResponse('it was GET request')
-#     response.set_cookie('csrftoken', 'valid')
-#     return response
+class UploadFileForm(forms.ModelForm):
+    class Meta:
+        model = models.File
+        fields = ['name_path', 'file_data',
+                  'last_update_time', 'md5sum']
+                 
+    # def save(self, user):
+    #     obj = super().save(commit = False)
+    #     obj.owner = user
+    #     obj.save()
+    #     return obj
+class UploadFile(generic.CreateView):
+    template_name='upload_file/file_upload.html'
+    form_class=UploadFileForm # (initial={'owner':request.user.id})
 
+    def dispatch(self, *args, **kwargs):
+        return super(UploadFile, self).dispatch(*args, **kwargs)
 
-def index(request):
-    template = loader.get_template('upload_file/file_upload.html')
-    return HttpResponse(template.render())
+    def form_valid(self, form):
+        models.File.objects.filter(owner=self.request.user, name_path=form.cleaned_data['name_path']).delete()
 
+        obj = form.save(commit=False)
+        obj.owner = self.request.user
+        obj.save()
+        return redirect(('/home'))
 
-class file_form(forms.Form):
-    file=forms.FileField()
-    name=forms.CharField(widget=forms.Textarea)
-
-
-def file_upload(request):
-    if request.method == 'POST':
-        form=file_form(request.POST)
-        if form.is_valid():
-            data = request.POST.copy()
-            path = data.get('filename')
-            content = data.get('filecontent')
-    return render(request, 'upload_file/file_upload.html')
