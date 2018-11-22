@@ -11,10 +11,11 @@
 
 #set -x
 arg_list="$@"
-log_level=2 # in addition, see "exit 1" in authenticate
+log_level=0 # in addition, see "exit 1" in authenticate
 host="127.0.0.1:8000/"
 login_url="$host"'login/'
 upload_url="$host"'upload_file/'
+download_url='' # created in authenticate
 cookies=~/.config/iitb-spc/.cookies
 auth_file=~/.config/iitb-spc/.auth
 enc_file=~/.config/iitb-spc/.credentials
@@ -45,14 +46,18 @@ main() {
     else
 	if [ -z "$2" ]; then printf "$usage"; exit 1; fi
 	authenticate
-	path=$(realpath "$2")
-	if ! [[ $path =~ $HOME/SPC* ]]
-	then
-	    echo "$2 should be inside $HOME/SPC/"
-	    exit 1
-	fi
-	if [ "$1" = "upload" ]; then upload "$2"
-	elif [ "$1" = "download" ]; then download "$2"
+	if [ "$1" = "upload" ]; then
+	    path=$(realpath "$2")
+	    if ! [[ $path =~ $HOME/SPC* ]]
+	    then
+		echo "$2 should be inside $HOME/SPC/"
+		exit 1
+	    fi
+	    upload "$2"
+	elif [ "$1" = "download" ]; then
+	    mkdir -p "$(dirname "$2")"
+	    # touch "$1"
+	    download "$2"
 	elif [ "$1" = "sync" ]; then sync "$2"
 	else printf "Unknown command: $1\n"; exit 1; fi
     fi
@@ -157,11 +162,6 @@ sync() {
 upload() {
     # echo In the case of a conflict, this will overwrite any file present on the server.
 #    shift # ignore the first arg
-    if [ "$#" = "0" ]; then
-	echo "Do you want to do this for all the files? ([y]/n)"
-	read response
-	if [[ $response = "n" || $response = "N" ]]; then exit 0; fi
-    fi
     item="$1" # handles a single file or folder
     if [ "$item" = "." ]; then
 	item=$(pwd)
@@ -180,8 +180,26 @@ upload() {
 }
 
 download() {
-    printf "Download is not yet ready.\n"
-    exit 0
+    item="$1" # handles a single file or folder
+    #download_url="$host"'download_file/data/'"$username/$1"
+    #curl_bin="curl -s -c $cookies -b $cookies -e $download_url"
+    #contents="$($curl_bin "$download_url")"
+    #echo "$contents"
+    #echo "$contents" | jq
+    if [ "$item" = "." ]; then
+	item=$(pwd)
+	echo $item
+    fi
+    if [ -d "$item" ]; then
+	IFS=$'\n' # use new lines as field separators
+	subitem_list=$(find "$item" -not -type d)
+	for subitem in $subitem_list; do
+	    #echo Uploading file $file ...
+	    upload_file "$subitem"
+	done
+    else
+	download_file "$item"
+    fi
 }
 
 upload_file(){
@@ -226,20 +244,32 @@ upload_file(){
 	token=\"$(grep csrftoken $cookies | sed 's/^.*csrftoken\s*//')\"
 
 	CURL=$($curl_bin "$upload_url" -X POST -d @- <<EOF
-$django_token&user_name_path=$username/$name&file_data=$content&last_update_time=$lut&md5sum=$md5
+$django_token&user_name_path=$username/$name&file_data=$content&last_update_time=$lut&file_type=$type&md5sum=$md5
 EOF
 	    )
 	if [ ! -z "$CURL" ]; then
 	    # echo Curl was unsuccessful
 	    $curl_bin "$host"delete"/$username/$name" > /dev/null
 	    $curl_bin "$upload_url" > -X POST -d @- <<EOF
-$django_token&user_name_path=$username/$name&file_data=$content&last_update_time=$lut&md5sum=$md5
+$django_token&user_name_path=$username/$name&file_data=$content&last_update_time=$lut&file_type=$type&md5sum=$md5
 EOF
 	fi	
     else
 	echo $1 is not a regular file or a symlink.
 	printf "  Uploading it as an empty file...\n"
     fi
+}
+
+download_file() {
+    # downloads a single file
+    echo Downloading "$1"
+    download_url="$host"'download_file/data/'"$username/$1"
+    curl_bin="curl -s -c $cookies -b $cookies -e $download_url"
+    contents=$($curl_bin $download_url)
+    dec "$contents" "$1"
+    #file_data=$(dec "$contents")
+    #printf "$file_data" > "$1"
+    
 }
 
 enc() {
@@ -252,6 +282,16 @@ enc() {
     # echo Key: $key
     # echo IV: $iv
     openssl enc $method -K $key -iv $iv -nosalt -base64 -in "$1" | tr -d '\n'	
+}
+
+dec() {
+    method=$(cat $enc_file)
+    unset -v key iv
+    for var in key iv; do
+	IFS= read -r "$var" || break
+    done < $key_file
+    echo "$1" | tr ' ' '+' | sed -e "s/.\{80\}/&\n/g" \
+	| openssl enc -d $method -K $key -base64 -iv $iv -nosalt -a -out "$2"
 }
 
 get_type() {
