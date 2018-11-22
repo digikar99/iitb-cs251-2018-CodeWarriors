@@ -11,7 +11,7 @@
 
 #set -x
 arg_list="$@"
-log_level=2 # in addition, see "exit 1" in authenticate
+log_level=0 # in addition, see "exit 1" in authenticate
 host="127.0.0.1:8000/"
 login_url="$host"'login/'
 upload_url="$host"'upload_file/'
@@ -187,19 +187,20 @@ upload_file(){
 	spc_root="/home/$USER/SPC/"
 	# get file name wrt to the spc root
 	name=$(echo ${1#$spc_root}) # is echo necessary?
-	type=""
+	type=$(get_type "$name")
 	echo Uploading $name...
 	#enc "$1"
 	content=$(enc "$1")
 	lut=$(stat -c %Z "$1") # last_update_time
-	md5=$(md5sum "$1")
+	md5=$(echo $content | md5sum | cut -d " " -f 1)
 	if [ "$log_level" -gt "0" ]; then
 	    echo =================================
 	    echo name_path: $name
 	    echo file_data: [not shown]
 	    echo last_update_time: $lut
-	    echo file_type: 
+	    echo file_type: $type
 	    echo md5sum: $md5
+	    echo $content > "$1.enc"
 	fi
 
 	unset IFS
@@ -222,7 +223,7 @@ upload_file(){
 	$curl_bin "$upload_url" -X POST -d @- <<EOF
 $django_token&name_path=$name&file_data=$content&last_update_time=$lut&md5sum=$md5
 EOF
-	# $curl_bin "$upload_url" -d "$django_token" -X POST -d @- <<CURL
+	# $curl_bin "$upload_url" -d "$django_token" -X POST --data-urlencode @- <<CURL
 # { 
 #   "name_path": $name, 
 #   "file_data": $content, 
@@ -248,6 +249,14 @@ enc() {
     # echo Key: $key
     # echo IV: $iv
     openssl enc $method -K $key -iv $iv -nosalt -base64 -in "$1" | tr -d '\n'	
+}
+
+get_type() {
+    possible_extension="${1##*.}"
+    if [ "$1" = "$possible_extension" ]; then
+	read -p "Specify filetype (mp4, png, bmp, jpg, jpeg, other) of $1: " possible_extension
+    fi
+    echo $possible_extension
 }
 
 main "$@"
