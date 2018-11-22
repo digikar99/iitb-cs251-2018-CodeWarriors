@@ -101,7 +101,7 @@ function downloadFile(file){
     file_name = $(file.target).text().slice(1);
     axios.get(host+current_folder+file_name).then(function(response){
 	// console.log(response.data);
-	file_data = response.data;
+	file_data = response.data.replace(/ /g, '+');;
 	decryptFile();
     });
 }
@@ -168,6 +168,7 @@ function decryptFile(){
 	iv = CryptoJS.enc.Hex.parse(localStorage['iitb-spc-dec-keys']
 				    .split(',')[1]);
 	console.log(file_data.length);
+	console.log(file_data);
 	var ciphertext = CryptoJS.enc.Base64.parse(file_data);
 	var dec = ''
 	if (e == 'aes'){
