@@ -28,10 +28,11 @@ usage="$(basename "$0") command-line interface
 Commands:
  help			show this help text
  sync 			upload and download the files with latest changes
- upload [file/folder]	upload the single file folder 
- download [file/folder] download the single file / folder 
+ upload [file|folder/]	upload the single file folder 
+ download [file|folder/] download the single file / folder 
  config			provide new username and password
  ende-change		change encryption / decryption scheme
+ ende-list		see encryption scheme; get keys in a file $HOME/keys.txt
 (see man page for more detailed help)
 "
 
@@ -42,6 +43,10 @@ main() {
     elif [ "$1" = "help" ]; then
 	printf "$usage" ; exit 0;
     elif [ "$1" = "ende-change" ]; then ende-change
+    elif [ "$1" = "ende-list" ]; then
+	echo -n Encryption scheme:
+	cat "$enc_file"
+	cp "$key_file" "$HOME/keys.txt"
     elif [ "$1" = "config" ]; then config
     else
 	if [ -z "$2" ]; then printf "$usage"; exit 1; fi
@@ -158,8 +163,6 @@ sync() {
 }
 
 upload() {
-    # echo In the case of a conflict, this will overwrite any file present on the server.
-#    shift # ignore the first arg
     item="$1" # handles a single file or folder
     if [ "$item" = "." ]; then
 	item=$(pwd)
@@ -209,20 +212,6 @@ EOF
 	download_file "$item"
     fi
     
-    # if [ "$item" = "." ]; then
-    # 	item=$(pwd)
-    # 	echo $item
-    # fi
-    # if [ -d "$item" ]; then
-    # 	IFS=$'\n' # use new lines as field separators
-    # 	subitem_list=$(find "$item" -not -type d)
-    # 	for subitem in $subitem_list; do
-    # 	    #echo Uploading file $file ...
-    # 	    upload_file "$subitem"
-    # 	done
-    # else
-	
-    # fi
 }
 
 upload_file(){
