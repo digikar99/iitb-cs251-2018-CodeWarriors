@@ -11,7 +11,7 @@
 
 #set -x
 arg_list="$@"
-log_level=0 # in addition, see "exit 1" in authenticate
+log_level=2 # in addition, see "exit 1" in authenticate
 host="127.0.0.1:8000/"
 login_url="$host"'login/'
 upload_url="$host"'upload_file/'
@@ -55,8 +55,6 @@ main() {
 	    fi
 	    upload "$2"
 	elif [ "$1" = "download" ]; then
-	    mkdir -p "$(dirname "$2")"
-	    # touch "$1"
 	    download "$2"
 	elif [ "$1" = "sync" ]; then sync "$2"
 	else printf "Unknown command: $1\n"; exit 1; fi
@@ -181,25 +179,50 @@ upload() {
 
 download() {
     item="$1" # handles a single file or folder
-    #download_url="$host"'download_file/data/'"$username/$1"
-    #curl_bin="curl -s -c $cookies -b $cookies -e $download_url"
-    #contents="$($curl_bin "$download_url")"
-    #echo "$contents"
-    #echo "$contents" | jq
-    if [ "$item" = "." ]; then
-	item=$(pwd)
-	echo $item
-    fi
-    if [ -d "$item" ]; then
-	IFS=$'\n' # use new lines as field separators
-	subitem_list=$(find "$item" -not -type d)
-	for subitem in $subitem_list; do
-	    #echo Uploading file $file ...
-	    upload_file "$subitem"
-	done
+    download_url="$host"'download_file/data/'"$username/$1"
+    download_url=${download_url// /%20}
+    curl_bin="curl -s -c $cookies -b $cookies -e ""$download_url"
+    #echo "$download_url"
+    contents="$($curl_bin "$download_url")"
+    #echo $contents
+    python3 2> /dev/null -c "dir_contents = dict($contents)"
+    if [ "$?" -eq "0" ]; then
+	# that is a dictionary indeed
+	sub_dirs=$(python3 <<EOF
+dir_contents = dict($contents)
+for item in dir_contents:
+    if dir_contents[item] == 'dir':
+        print(item)
+EOF
+		)
+	for dir in $sub_dirs; do download "$dir"; done
+	files=$(python3 <<EOF
+dir_contents = dict($contents)
+for item in dir_contents:
+    if dir_contents[item] == 'file':
+        print(item)
+EOF
+	     )
+	for file in $files; do download_file "$1$file"; done
     else
+	# that is not a dictionary
 	download_file "$item"
     fi
+    
+    # if [ "$item" = "." ]; then
+    # 	item=$(pwd)
+    # 	echo $item
+    # fi
+    # if [ -d "$item" ]; then
+    # 	IFS=$'\n' # use new lines as field separators
+    # 	subitem_list=$(find "$item" -not -type d)
+    # 	for subitem in $subitem_list; do
+    # 	    #echo Uploading file $file ...
+    # 	    upload_file "$subitem"
+    # 	done
+    # else
+	
+    # fi
 }
 
 upload_file(){
@@ -223,7 +246,7 @@ upload_file(){
 	    echo last_update_time: $lut
 	    echo file_type: $type
 	    echo md5sum: $md5
-	    echo $content > "$1.enc"
+	    #echo $content > "$1.enc"
 	fi
 
 	unset IFS
@@ -262,10 +285,12 @@ EOF
 
 download_file() {
     # downloads a single file
-    echo Downloading "$1"
+    echo Downloading "$1"...
+    mkdir -p "$(dirname "$1")"
     download_url="$host"'download_file/data/'"$username/$1"
-    curl_bin="curl -s -c $cookies -b $cookies -e $download_url"
-    contents=$($curl_bin $download_url)
+    download_url=${download_url// /%20}
+    curl_bin="curl -s -c $cookies -b $cookies -e ""$download_url"
+    contents="$($curl_bin "$download_url")"
     dec "$contents" "$1"
     #file_data=$(dec "$contents")
     #printf "$file_data" > "$1"
@@ -290,6 +315,7 @@ dec() {
     for var in key iv; do
 	IFS= read -r "$var" || break
     done < $key_file
+    # echo "$1" | tr ' ' '+' | sed -e "s/.\{80\}/&\n/g"
     echo "$1" | tr ' ' '+' | sed -e "s/.\{80\}/&\n/g" \
 	| openssl enc -d $method -K $key -base64 -iv $iv -nosalt -a -out "$2"
 }
@@ -303,71 +329,3 @@ get_type() {
 }
 
 main "$@"
-
-
-
-# exit if no options supplied
-# if [ -z "$file" ]; then echo "$usage"; exit; fi
-# path=$(realpath "$file")
-# if ! [[ $path =~ $HOME/SPC* ]]
-# then
-#     echo "$file should be inside $HOME/SPC/"
-#     exit 1
-# fi
-
-
-####################################################################
-
-# 1. Authenticate
-
-# echo -n " do something while logged in ..."
-# $curl_bin \
-#    -d "$django_token&..." \
-#    -X POST https://127.0.0.1:8000/whatever/
-
-##########################################################################
-
-# if [ "$log_level" > "0" ]; then echo "Logged in..." ; fi
-
-# # 2. Determine file type, get file contents, name and type in a json object
-# # file=$(realpath "$1") # has been obtained in part 0 already
-# spc_root="/home/$USER/SPC/"
-# # get file name wrt to the spc root
-# name=$(echo ${file#$spc_root}) # is echo necessary?
-# content=$(cat "$file")
-# type=""
-
-# # Reference: https://stackoverflow.com/questions/12524437/output-json-from-bash-script
-# json_obj="{\"name\":\""$name"\", \"content\":\""$content"\", \"type\":\""$type"\"}"
-
-# printf "\nThe following will be sent: \n$json_obj\n"
-
-# ########################################################################
-# # 3. Send json object to the server
-
-# printf "\nAttempting to upload...\n"
-
-# upload_url="http://127.0.0.1:8000/upload_file/"
-# # cookie="cookie2.txt" # cookie is unused
-
-# # echo Django token: $django_token
-
-# $curl_bin \
-#     -d "$json_obj" \
-#     -X POST "$upload_url"
-
-# curl -v -c $cookie -b $cookie "$upload_url"
-# django_token="csrfmiddlewaretoken=$(grep csrftoken $cookie | sed 's/^.*csrftoken\s*//')"
-# echo =============================
-# echo Token: $django_token
-# curl -v -c $cookie -b $cookie -d "data=hello&csrfmiddlewaretoken=$django_token" "$u
-# pload_url"
-
-# curl "$upload_url"
-# curl --header "Content-Type: application/json" \
-#      --request POST \
-#      --data "$json_obj" \
-#      "$upload_url"
-
-
-
