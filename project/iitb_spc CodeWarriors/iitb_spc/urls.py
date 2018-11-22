@@ -24,6 +24,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('upload_file/', include('upload_file.urls')),
     path('download_file/', include('download_file.urls')),
+    path('delete/', include('delete.urls')),
     path('', views.LoginView.as_view()),
     path('', include('accounts.urls')), # all the urls in accounts section
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
