@@ -4,17 +4,21 @@ var $ = require('jquery');
 
 /************************ LOADING KEYS **************************************/
 if (localStorage['iitb-spc-dec-keys']!=null){
-    $('dec-key-cache').innerHTML 
-	= "Keys are present in browser cache. Choose the new file, only if "
-	+ "you want to update the decryption keys. Note that this will "
-	+ "overwrite the existing keys present in browser cache.";
+    $('#dec-key-cache').html( 
+	"Keys are present in browser cache. Choose the new file, only if "
+	    + "you want to update the decryption keys. Note that this will "
+	    + "overwrite the existing keys present in browser cache.");
     
 } else {
-    $('#dec-key-cache').innerHTML
-	= "Please select the file containing decryption keys.";
+    $('#dec-key-cache').html(
+	"Please select the file containing decryption keys.");
 }
 
-$('#load-key').click(function(){
+$('#dec-key-change').click(function() {
+    $('#dec-key').show();
+});
+
+$('#dec-key').change(function(){
     var file = $('#dec-key').prop('files')[0];
     var reader = new FileReader();
     reader.readAsText(file, "UTF-8");
@@ -40,6 +44,7 @@ $('#load-key').click(function(){
 /************************ LOADING FILE FOR DEBUG ****************************/
 
 file_data = '' // [encrypted] file contents
+file_name = ''
 
 $('#load-enc-file').click(function(){
     var file = $('#enc-file').prop('files')[0];
@@ -60,6 +65,7 @@ $('#load-enc-file').click(function(){
 
 message = ''
 host='http://127.0.0.1:8000/download_file'
+// host='http://10.42.0.1/download_file'
 var current_folder = ''
 
 /*************************** LOADING FILE FROM SERVER ***********************/
@@ -67,15 +73,26 @@ var current_folder = ''
 function listFolder(fold_name){
     if (typeof(fold_name) != 'string'){
 	fold_name = $(fold_name.target).text().slice(1);
+	// console.log("Folder name: " + fold_name);
 	// note the space added/removed
     }
-    current_folder = current_folder + fold_name + '/';
+    if (fold_name == ' ..'){
+	current_folder = current_folder.split('/').slice(0,-2).join('/') + '/';
+	// console.log("One folder up: " + current_folder);
+    } else {
+	current_folder = current_folder + fold_name + '/';
+    }
+    // console.log(current_folder);
     axios.get(host+current_folder).then(function(response){
-	console.log(current_folder);
+	// console.log(current_folder);
 	var item_list = response.data;
 	var dest = $('#directory-contents');
 	dest.empty();
 	var dir_node = '';
+	if (current_folder != '/')
+	    dir_node = '<li class="folder"><i class="fa fa-folder" aria-hidden="true"></i> '
+	    + ' ..' + '</li>';
+	dest.append(dir_node);
 	for(var item in item_list){ // first display the directories
 	    if (item_list[item] == 'dir'){
 		dir_node = '<li class="folder"><i class="fa fa-folder" aria-hidden="true"></i> '
@@ -98,10 +115,13 @@ function listFolder(fold_name){
 }
 
 function downloadFile(file){
-    file_name = $(file.target).text().slice(1);
-    axios.get(host+current_folder+file_name).then(function(response){
+    fname = $(file.target).text().slice(1);
+    $('#decryption-status').html("Decryption started...");
+    $('#download-anchor').hide();
+    axios.get(host+current_folder+fname).then(function(response){
 	// console.log(response.data);
-	file_data = response.data.replace(/ /g, '+');;
+	file_data = response.data.replace(/ /g, '+');
+	file_name = fname;
 	decryptFile();
     });
 }
@@ -112,6 +132,7 @@ function downloadFile(file){
 function decrypt_core_AES_CBC(key, iv, ciphertext) {
     // console.log(key);
     // console.log(iv);
+    $('#decryption-status').html("Decryption started...");
     message = CryptoJS.AES.decrypt({
 	ciphertext: ciphertext
     }, key, {
@@ -141,6 +162,7 @@ function decrypt_core_Camellia_CBC(key, iv, ciphertext) {
     // there's no camellia module in cryptojs!!
     // console.log(key);
     // console.log(iv);
+    
     message = CryptoJS.Camellia.decrypt({
 	ciphertext: ciphertext
     }, key, {
@@ -154,12 +176,6 @@ function decrypt_core_Camellia_CBC(key, iv, ciphertext) {
 
 function decryptFile(){
     if (localStorage['iitb-spc-dec-keys']){
-	console.log('ready to decrypt');
-	/* "Somehow" get the encrypted data from the server.
-	 * Decrypt it. 
-	 * Display it to the user.
-	 */
-	// Note that file_data has been loaded above.
 	file_type = 'pdf'
 	//file_data = '2DHTnGWbbw2onuMjTu2e9A=='
 	e = $('#algo').val();
@@ -168,7 +184,7 @@ function decryptFile(){
 	iv = CryptoJS.enc.Hex.parse(localStorage['iitb-spc-dec-keys']
 				    .split(',')[1]);
 	console.log(file_data.length);
-	console.log(file_data);
+	// console.log(file_data);
 	var ciphertext = CryptoJS.enc.Base64.parse(file_data);
 	var dec = ''
 	if (e == 'aes'){
@@ -179,14 +195,18 @@ function decryptFile(){
 	    dec = decrypt_core_Camellia_CBC(key, iv, ciphertext);
 	}
 	console.log("decryption successful");
-	console.log(typeof(dec));
+	// console.log(typeof(dec));
 	// console.log(dec);
 	$('#download-anchor')
 	    .prop('href',
-		  "data:application/octet-stream;"
+		  // "data:application/octet-stream;"
+		  "data:;"
 		  // = "data:application/mp4;" // for videos
 		  + "charset=utf-16le;base64,"
 		  + dec); // assume application/octet-stream
+	$('#download-anchor').prop('download', file_name);
+	$('#decryption-status').html('Decryption completed. ');
+	$('#download-anchor').show();
 	// + file_data.slice(28);
 
     } else {
@@ -195,7 +215,8 @@ function decryptFile(){
 }
 
 listFolder(current_folder);
-
+$('#download-anchor').hide();
+$('#dec-key').hide();
 
 /********* Reference: ***********/
 // https://stackoverflow.com/questions/31680986/how-to-achieve-cryptojs-decryption-using-aes-128-cbc-algorithm
