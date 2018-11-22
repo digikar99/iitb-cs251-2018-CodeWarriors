@@ -55,6 +55,7 @@ def getContents(request, file_path=None):
             l = getChildrenOfFolder(file_path)
             return JsonResponse(l)
         else:
+            f = File.objects.filter(name_path = file_path);
             if len(f) == 0:
                 return HttpResponseNotFound()
             else:
