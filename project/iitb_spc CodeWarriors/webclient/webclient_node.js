@@ -1,3 +1,4 @@
+// console.log('{{user.username}}')
 var CryptoJS = require('crypto-js');
 var axios = require('axios');
 var $ = require('jquery');
@@ -64,9 +65,9 @@ $('#load-enc-file').click(function(){
 });
 
 message = ''
-host='http://127.0.0.1:8000/download_file'
+var host='http://127.0.0.1:8000'
 // host='http://10.42.0.1/download_file'
-var current_folder = ''
+var current_folder = '/download_file/data/' + $('#username').html();
 
 /*************************** LOADING FILE FROM SERVER ***********************/
 
@@ -82,14 +83,14 @@ function listFolder(fold_name){
     } else {
 	current_folder = current_folder + fold_name + '/';
     }
-    // console.log(current_folder);
+    console.log(current_folder);
     axios.get(host+current_folder).then(function(response){
 	// console.log(current_folder);
 	var item_list = response.data;
 	var dest = $('#directory-contents');
 	dest.empty();
 	var dir_node = '';
-	if (current_folder != '/')
+	if (current_folder != '/download_file/data/' + $('#username').html()+'/')
 	    dir_node = '<li class="folder"><i class="fa fa-folder" aria-hidden="true"></i> '
 	    + ' ..' + '</li>';
 	dest.append(dir_node);
@@ -125,7 +126,6 @@ function downloadFile(file){
 	decryptFile();
     });
 }
-
 
 /*************************** DECRYPTING FILES ********************************/
 
@@ -214,7 +214,8 @@ function decryptFile(){
     }
 }
 
-listFolder(current_folder);
+// console.log(listFolder);
+listFolder('');
 $('#download-anchor').hide();
 $('#dec-key').hide();
 
