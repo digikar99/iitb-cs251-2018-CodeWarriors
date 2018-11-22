@@ -11,7 +11,7 @@
 
 #set -x
 arg_list="$@"
-log_level=0 # in addition, see "exit 1" in authenticate
+log_level=2 # in addition, see "exit 1" in authenticate
 host="127.0.0.1:8000/"
 login_url="$host"'login/'
 upload_url="$host"'upload_file/'
@@ -19,7 +19,9 @@ cookies=~/.config/iitb-spc/.cookies
 auth_file=~/.config/iitb-spc/.auth
 enc_file=~/.config/iitb-spc/.credentials
 key_file=~/.config/iitb-spc/.privkey
-pub_key=~/.config/iitb-spc/.pubkey    
+pub_key=~/.config/iitb-spc/.pubkey
+username=''
+password=''
 usage="$(basename "$0") command-line interface 
 
 Commands:
@@ -61,7 +63,8 @@ config() {
     
     printf "Change username and password: (Press Ctrl+C to cancel this action.)\n"
     read -p "Username: " user 
-    read  -p "Password: " -s pass 
+    read  -p "Password: " -s pass
+
     if [ "$log_level" -gt "1" ] ; then
 	printf "Username: $user\nPassword: $pass\n"
     else
@@ -87,7 +90,9 @@ authenticate() {
 	echo Username: $user
 	echo Password: $pass
     fi
-
+    username=$user
+    password=$pass
+    
     curl_bin="curl -s -c $cookies -b $cookies -e $login_url"
 
     # echo -n "Django Auth: get csrftoken ..."
@@ -220,19 +225,17 @@ upload_file(){
 	
 	token=\"$(grep csrftoken $cookies | sed 's/^.*csrftoken\s*//')\"
 
-	$curl_bin "$upload_url" -X POST -d @- <<EOF
-$django_token&name_path=$name&file_data=$content&last_update_time=$lut&md5sum=$md5
+	CURL=$($curl_bin "$upload_url" -X POST -d @- <<EOF
+$django_token&user_name_path=$username/$name&file_data=$content&last_update_time=$lut&md5sum=$md5
 EOF
-	# $curl_bin "$upload_url" -d "$django_token" -X POST --data-urlencode @- <<CURL
-# { 
-#   "name_path": $name, 
-#   "file_data": $content, 
-#   "last_update_time": $lut, 
-#   "md5sum": $md5 
-# }
-# CURL
-
-	
+	    )
+	if [ ! -z "$CURL" ]; then
+	    # echo Curl was unsuccessful
+	    $curl_bin "$host"delete"/$username/$name" > /dev/null
+	    $curl_bin "$upload_url" > -X POST -d @- <<EOF
+$django_token&user_name_path=$username/$name&file_data=$content&last_update_time=$lut&md5sum=$md5
+EOF
+	fi	
     else
 	echo $1 is not a regular file or a symlink.
 	printf "  Uploading it as an empty file...\n"
