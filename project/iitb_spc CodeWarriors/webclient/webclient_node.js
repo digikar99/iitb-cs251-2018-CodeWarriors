@@ -1,30 +1,29 @@
-//require('react');
 var CryptoJS = require('crypto-js');
-//require('react-dom');
+var axios = require('axios');
 var $ = require('jquery');
 
 /************************ LOADING KEYS **************************************/
 if (localStorage['iitb-spc-dec-keys']!=null){
-    document.getElementById('dec-key-cache').innerHTML 
+    $('dec-key-cache').innerHTML 
 	= "Keys are present in browser cache. Choose the new file, only if "
 	+ "you want to update the decryption keys. Note that this will "
 	+ "overwrite the existing keys present in browser cache.";
     
 } else {
-    document.getElementById('dec-key-cache').innerHTML
+    $('#dec-key-cache').innerHTML
 	= "Please select the file containing decryption keys.";
 }
 
-document.getElementById('load-key').addEventListener("click", function(){
-    var file = document.getElementById('dec-key').files[0];
+$('#load-key').click(function(){
+    var file = $('#dec-key').prop('files')[0];
     var reader = new FileReader();
     reader.readAsText(file, "UTF-8");
     reader.onload = function(e) {
-	// document.getElementById('hello').innerHTML = reader.result;
+	// $('#hello').innerHTML = reader.result;
 	console.log('file read');
 	console.log(reader.result);
-	e = document.getElementById('algo');
-	if (e.options[e.selectedIndex].value == 'rsa'){
+	e = $('#algo');
+	if (e.val() == 'rsa'){
 	    // if the value is rsa read it this way
 	    localStorage['iitb-spc-dec-keys'] = reader.result.split('\n')
 		.slice(1,26).join()
@@ -42,8 +41,8 @@ document.getElementById('load-key').addEventListener("click", function(){
 
 file_data = '' // [encrypted] file contents
 
-document.getElementById('load-enc-file').addEventListener("click", function(){
-    var file = document.getElementById('enc-file').files[0];
+$('#load-enc-file').click(function(){
+    var file = $('#enc-file').prop('files')[0];
     var reader = new FileReader();
     // reader.readAsDataURL(file); // for non text files
     reader.readAsText(file, "UTF-8");
@@ -55,11 +54,58 @@ document.getElementById('load-enc-file').addEventListener("click", function(){
 	console.log(file_data.length);
 	console.log('file reloaded');
 	decryptFile();
-	// document.getElementById('pdf').src = file_data;
+	// $('#pdf').src = file_data;
     }
 });
 
 message = ''
+host='http://127.0.0.1:8000/download_file'
+var current_folder = ''
+
+/*************************** LOADING FILE FROM SERVER ***********************/
+
+function listFolder(fold_name){
+    if (typeof(fold_name) != 'string'){
+	fold_name = $(fold_name.target).text().slice(1);
+	// note the space added/removed
+    }
+    current_folder = current_folder + fold_name + '/';
+    axios.get(host+current_folder).then(function(response){
+	console.log(current_folder);
+	var item_list = response.data;
+	var dest = $('#directory-contents');
+	dest.empty();
+	var dir_node = '';
+	for(var item in item_list){ // first display the directories
+	    if (item_list[item] == 'dir'){
+		dir_node = '<li class="folder"><i class="fa fa-folder" aria-hidden="true"></i> '
+		    + item + '</li>';
+		dest.append(dir_node);
+		//$('#directory-contents:last-child').click(listFolder(item));
+	    }
+	}
+	for(var item in item_list){ // then display the files
+	    if (item_list[item] == 'file'){
+		dir_node = '<li class="file"><i class="fa fa-file" aria-hidden="true"></i> '
+		    + item + '</li>';
+		dest.append(dir_node);
+		//$('#directory-contents:last-child').click(downloadFile(item));
+	    }
+	}
+	$('.folder').click(listFolder);
+	$('.file').click(downloadFile);
+    });
+}
+
+function downloadFile(file){
+    file_name = $(file.target).text().slice(1);
+    axios.get(host+current_folder+file_name).then(function(response){
+	// console.log(response.data);
+	file_data = response.data;
+	decryptFile();
+    });
+}
+
 
 /*************************** DECRYPTING FILES ********************************/
 
@@ -116,7 +162,7 @@ function decryptFile(){
 	// Note that file_data has been loaded above.
 	file_type = 'pdf'
 	//file_data = '2DHTnGWbbw2onuMjTu2e9A=='
-	e = document.getElementById('algo');
+	e = $('#algo').val();
 	key = CryptoJS.enc.Hex.parse(localStorage['iitb-spc-dec-keys']
 				     .split(',')[0]);
 	iv = CryptoJS.enc.Hex.parse(localStorage['iitb-spc-dec-keys']
@@ -124,21 +170,22 @@ function decryptFile(){
 	console.log(file_data.length);
 	var ciphertext = CryptoJS.enc.Base64.parse(file_data);
 	var dec = ''
-	if (e.options[e.selectedIndex].value == 'aes'){
+	if (e == 'aes'){
 	    dec = decrypt_core_AES_CBC(key, iv, ciphertext);
-	} else if (e.options[e.selectedIndex].value == '3des'){
+	} else if (e == '3des'){
 	    dec = decrypt_core_TripleDES_CBC(key, iv, ciphertext);
-	} else if (e.options[e.selectedIndex].value == 'camellia'){
+	} else if (e == 'camellia'){
 	    dec = decrypt_core_Camellia_CBC(key, iv, ciphertext);
 	}
 	console.log("decryption successful");
 	console.log(typeof(dec));
 	// console.log(dec);
-	document.getElementById('download-anchor').href
-	    = "data:application/octet-stream;"
-	// = "data:application/mp4;" // for videos
-	    + "charset=utf-16le;base64,"
-	    + dec; // assume application/octet-stream
+	$('#download-anchor')
+	    .prop('href',
+		  "data:application/octet-stream;"
+		  // = "data:application/mp4;" // for videos
+		  + "charset=utf-16le;base64,"
+		  + dec); // assume application/octet-stream
 	// + file_data.slice(28);
 
     } else {
@@ -146,11 +193,11 @@ function decryptFile(){
     }
 }
 
-
+listFolder(current_folder);
 
 
 /********* Reference: ***********/
 // https://stackoverflow.com/questions/31680986/how-to-achieve-cryptojs-decryption-using-aes-128-cbc-algorithm
 // http://jsfiddle.net/fyodgw58/1/
 
-// ReactDOM.render(<MyDocument />, document.getElementById('pdf'));
+// ReactDOM.render(<MyDocument />, $('#pdf'));
