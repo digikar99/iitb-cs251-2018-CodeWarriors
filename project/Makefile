@@ -10,10 +10,7 @@ curl:
 	sudo apt install curl
 
 install: home config curl bin
-	fp="$(realpath linux-client.sh)" ;\
-	ln -s $$fp $$HOME/bin/iitb-spc	
-
-reinstall: home config curl bin
 	rm -f $$HOME/bin/iitb-spc ;\
 	fp="$(realpath linux-client.sh)" ;\
-	ln -s $$fp $$HOME/bin/iitb-spc	
+	ln -s $$fp $$HOME/bin/iitb-spc ;\
+	chmod +x ~/bin/iitb-spc
