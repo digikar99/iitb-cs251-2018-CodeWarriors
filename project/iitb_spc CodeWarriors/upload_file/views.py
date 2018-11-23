@@ -33,6 +33,7 @@ class UploadFile(generic.CreateView):
                 if time_diff.total_seconds() > 15 * 60 or Session.ip == prev_Session[0].ip:
                     a=models.File.objects.filter(user_name_path = obj.user_name_path)
                     a.delete()
+                    Session.save()
                 else:
                     return HttpResponseForbidden()
             obj.save()
