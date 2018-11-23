@@ -158,12 +158,12 @@ function decrypt_core_TripleDES_CBC(key, iv, ciphertext) {
     return CryptoJS.enc.Base64.stringify(message);
 }
 
-function decrypt_core_Camellia_CBC(key, iv, ciphertext) {
+function decrypt_core_DES_CBC(key, iv, ciphertext) {
     // there's no camellia module in cryptojs!!
     // console.log(key);
     // console.log(iv);
     
-    message = CryptoJS.Camellia.decrypt({
+    message = CryptoJS.DES.decrypt({
 	ciphertext: ciphertext
     }, key, {
 	iv: iv,
@@ -191,8 +191,8 @@ function decryptFile(){
 	    dec = decrypt_core_AES_CBC(key, iv, ciphertext);
 	} else if (e == '3des'){
 	    dec = decrypt_core_TripleDES_CBC(key, iv, ciphertext);
-	} else if (e == 'camellia'){
-	    dec = decrypt_core_Camellia_CBC(key, iv, ciphertext);
+	} else if (e == 'DES'){
+	    dec = decrypt_core_DES_CBC(key, iv, ciphertext);
 	}
 	console.log("decryption successful");
 	// console.log(typeof(dec));
