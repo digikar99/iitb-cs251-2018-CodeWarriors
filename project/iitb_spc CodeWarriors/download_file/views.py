@@ -12,7 +12,7 @@ def getChildrenOfFolder(fold_name):
     # and we already know that fold_name ends in '/'
 
     # create {name: type} pairs for easy parsing in webclient
-    print('========================================')
+    # print('========================================')
     # print(l)
     name_type = dict()
     for f in l:

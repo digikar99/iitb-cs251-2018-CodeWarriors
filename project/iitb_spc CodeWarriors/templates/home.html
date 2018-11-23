@@ -14,6 +14,9 @@
 	hr{
 		border-top: 2px solid black;
 	}
+	body{
+		font-size: 0.5cm;
+	}
 	.file, .folder{
 		border-top: 0.5px solid #222;
 		border-bottom: 0.5px solid #222;
@@ -29,9 +32,11 @@
     		<div class="col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2 col-xs-10 col-xs-offset-1">
     			<br>
     			<br>
-    			Hello <span id="username">{{ user.username }}</span>!
+    			<div class="text-center">Username: <span id="username">{{ user.username }}</span></div>
     			<hr>
-    			<p><span id="decryption-status"></span><a download="" id="download-anchor" href="data:application/octet-stream;charset=utf-16le;base64,">Download File</a></p>
+    			<p>Tap / Click to open folder; or download files or view images.</p>
+    			<p class="text-center"><span id="decryption-status"></span><a download="" id="download-anchor" href="data:application/octet-stream;charset=utf-16le;base64,">Download File</a><button data-toggle="modal" data-target="#myModal" id="view-button">View Media</button></p>
+
     			<ul id="directory-contents">
     				<!-- Will be filled by javascript -->
     			</ul>
@@ -41,7 +46,7 @@
 	    				<select name="algo" id='algo'>
 	    				  <option value="aes">AES 192 CBC</option>
 	    				  <option value="3des">Triple DES (192)</option>
-	    				  <option value="DES">DES-CBC</option>
+	    				  <option value="des">DES-CBC</option>
 	    				</select>
     				</p>
     				<p>Note: Choosing the wrong algorithm will cause a garbage file to be displayed.</p>
@@ -49,18 +54,51 @@
     			<hr>
     			<div>
     				<p id="dec-key-cache"></p>
-    				<p><button style="display:inline;" id="dec-key-change">Choose decryption-keys</button>           <input style="display:inline;" type="file" id="dec-key"></p>
+    				<div class="text-center"><button style="display:inline;" id="dec-key-change">Choose decryption-keys</button></div>
+    				<div class="text-center"><input style="display:inline;" type="file" id="dec-key"></div>
+    			</div>
+    			<hr>
+    			<div class="text-center">
+    				<a href="{% url 'logout' %}">Click to logout</a>
+    			</div>
+    			<br>
+
+    			<!-- Modal -->
+    			<div id="myModal" class="modal fade" role="dialog">
+    			  <div class="modal-dialog">
+
+    			    <!-- Modal content-->
+    			    <div class="modal-content">
+    			      <div class="modal-header">
+    			        <button type="button" class="close" data-dismiss="modal">&times;</button>
+    			        <h4 class="modal-title text-center" id="view-name"></h4>
+    			      </div>
+    			      <div class="modal-body">
+    			      	<img class="center-block" src="" id='view-image-anchor'>
+    			      	<video width="640" height="360" autoplay>
+    			      		<source id="view-video-anchor" src="">
+    			      	</video>
+    			      </div>
+    			      <div class="modal-footer">
+    			        <div class="text-center"><button type="button" class="btn btn-default" data-dismiss="modal">Close</button></div>
+    			      </div>
+    			    </div>
+
+    			  </div>
     			</div>
     		</div>
+
     	</div>
     </div>
+
+
+
    
    <!--
     <div>
     	<p>Upload encrypted file. Note: This is to be used only for testing purposes.</p>
     	<input type="file" id="enc-file">
     	<button id="load-enc-file">Load Encrypted File</button>
-    	<embed id='pdf'></embed>
     </div>
     -->
     
