@@ -149,8 +149,8 @@ function decrypt_core_AES_CBC(key, iv, ciphertext) {
 	mode: CryptoJS.mode.CBC
     }); 
     //console.log(message);
-    message.replace('','');
-    mesasge.replace('','');
+//    message.replace('','');
+//    mesasge.replace('','');
     return CryptoJS.enc.Base64.stringify(message);
 }
 
@@ -165,6 +165,8 @@ function decrypt_core_TripleDES_CBC(key, iv, ciphertext) {
 	mode: CryptoJS.mode.CBC
     }); 
     //console.log(message);
+//    message.replace('','');
+//    mesasge.replace('','');
     return CryptoJS.enc.Base64.stringify(message);
 }
 
