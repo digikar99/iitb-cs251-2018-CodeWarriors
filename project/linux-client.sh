@@ -156,7 +156,7 @@ sync() {
     url="$(replace_spaces_in_url "$url")"
     curl_bin="curl -s -c $cookies -b $cookies -e $url"
     contents="$($curl_bin "$url")"
-    echo $contents
+    #echo $contents
     server_files=$(python3 <<EOF
 for file in $contents:
     print(file)
@@ -308,8 +308,8 @@ EOF
 	    )
 	if [ ! -z "$CURL" ]; then
 	    # echo Curl was unsuccessful
-	    $curl_bin "$host"delete"/$username/$name" > /dev/null
-	    $curl_bin "$upload_url" > -X POST -d @- <<EOF
+	    $curl_bin "$(replace_spaces_in_url "$host"delete"/$username/$name")" > /dev/null
+	    $curl_bin "$upload_url" -X POST -d @- <<EOF
 $django_token&user_name_path=$username/$name&file_data=$content&last_update_time=$lut&file_type=$type&md5sum=$md5
 EOF
 	fi	
@@ -328,6 +328,11 @@ download_file() {
     curl_bin="curl -s -c $cookies -b $cookies -e ""$download_url"
     contents="$($curl_bin "$download_url")"
     dec "$contents" "$1"
+    time_url="$host"'download_file/last_update_time/'"$username/$1"
+    time_url="$(replace_spaces_in_url "$time_url")"
+    curl_bin="curl -s -c $cookies -b $cookies -e $time_url"
+    on_server=$($curl_bin $time_url)
+    touch -d @$on_server "$1"
     #file_data=$(dec "$contents")
     #printf "$file_data" > "$1"
     
@@ -359,8 +364,8 @@ dec() {
 get_type() {
     possible_extension="${1##*.}"
     if [ "$1" = "$possible_extension" ]; then
-	possible_extension=other
 	read -p "Specify filetype (mp4, png, bmp, jpg, jpeg, [other]) of $1: " possible_extension
+	if [ -z "$possible_extension" ]; then possible_extension=other; fi
     fi
     echo $possible_extension
 }
