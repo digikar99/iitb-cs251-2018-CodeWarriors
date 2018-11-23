@@ -18470,28 +18470,31 @@ $('#dec-key').change(function(){
 
 file_data = '' // [encrypted] file contents
 file_name = ''
+file_type = ''
 
 $('#load-enc-file').click(function(){
     var file = $('#enc-file').prop('files')[0];
     var reader = new FileReader();
-    // reader.readAsDataURL(file); // for non text files
-    reader.readAsText(file, "UTF-8");
+    reader.readAsDataURL(file); // for non text files
+    //reader.readAsText(file, "UTF-8");
     reader.onload = function(e) {
 	console.log('encrypted file loaded');
 	// console.log(reader.result);
 	console.log(typeof(reader.result));
 	file_data = reader.result;
+	console.log(file_data);
 	console.log(file_data.length);
 	console.log('file reloaded');
-	decryptFile();
 	// $('#pdf').src = file_data;
     }
 });
 
 message = ''
+var username = $('#username').html()
 var host='http://127.0.0.1:8000'
 // host='http://10.42.0.1/download_file'
-var current_folder = '/download_file/data/' + $('#username').html();
+var current_folder = '';
+var server_data = '/download_file/data/'
 
 /*************************** LOADING FILE FROM SERVER ***********************/
 
@@ -18508,13 +18511,13 @@ function listFolder(fold_name){
 	current_folder = current_folder + fold_name + '/';
     }
     console.log(current_folder);
-    axios.get(host+current_folder).then(function(response){
+    axios.get(host+server_data+current_folder).then(function(response){
 	// console.log(current_folder);
 	var item_list = response.data;
 	var dest = $('#directory-contents');
 	dest.empty();
 	var dir_node = '';
-	if (current_folder != '/download_file/data/' + $('#username').html()+'/')
+	if (current_folder != username+'/')
 	    dir_node = '<li class="folder"><i class="fa fa-folder" aria-hidden="true"></i> '
 	    + ' ..' + '</li>';
 	dest.append(dir_node);
@@ -18543,12 +18546,18 @@ function downloadFile(file){
     fname = $(file.target).text().slice(1);
     $('#decryption-status').html("Decryption started...");
     $('#download-anchor').hide();
-    axios.get(host+current_folder+fname).then(function(response){
+    $('#view-button').hide();
+    axios.get(host+server_data+current_folder+fname).then(function(response){
 	// console.log(response.data);
 	file_data = response.data.replace(/ /g, '+');
 	file_name = fname;
 	decryptFile();
     });
+    axios.get(host+'/download_file/file_type/'+current_folder+fname)
+	.then(function(response){
+	    console.log(response.data);
+	    file_type = response.data;
+	})
 }
 
 /*************************** DECRYPTING FILES ********************************/
@@ -18556,12 +18565,11 @@ function downloadFile(file){
 function decrypt_core_AES_CBC(key, iv, ciphertext) {
     // console.log(key);
     // console.log(iv);
-    $('#decryption-status').html("Decryption started...");
     message = CryptoJS.AES.decrypt({
 	ciphertext: ciphertext
     }, key, {
 	iv: iv,
-	padding: CryptoJS.pad.NoPadding, 
+	padding: CryptoJS.pad.ZeroPadding, 
 	mode: CryptoJS.mode.CBC
     }); 
     //console.log(message);
@@ -18582,12 +18590,12 @@ function decrypt_core_TripleDES_CBC(key, iv, ciphertext) {
     return CryptoJS.enc.Base64.stringify(message);
 }
 
-function decrypt_core_Camellia_CBC(key, iv, ciphertext) {
+function decrypt_core_DES_CBC(key, iv, ciphertext) {
     // there's no camellia module in cryptojs!!
     // console.log(key);
     // console.log(iv);
     
-    message = CryptoJS.Camellia.decrypt({
+    message = CryptoJS.DES.decrypt({
 	ciphertext: ciphertext
     }, key, {
 	iv: iv,
@@ -18600,8 +18608,7 @@ function decrypt_core_Camellia_CBC(key, iv, ciphertext) {
 
 function decryptFile(){
     if (localStorage['iitb-spc-dec-keys']){
-	file_type = 'pdf'
-	//file_data = '2DHTnGWbbw2onuMjTu2e9A=='
+	$('#decryption-status').html("Decryption started...");
 	e = $('#algo').val();
 	key = CryptoJS.enc.Hex.parse(localStorage['iitb-spc-dec-keys']
 				     .split(',')[0]);
@@ -18615,23 +18622,48 @@ function decryptFile(){
 	    dec = decrypt_core_AES_CBC(key, iv, ciphertext);
 	} else if (e == '3des'){
 	    dec = decrypt_core_TripleDES_CBC(key, iv, ciphertext);
-	} else if (e == 'camellia'){
-	    dec = decrypt_core_Camellia_CBC(key, iv, ciphertext);
+	} else if (e == 'des'){
+	    dec = decrypt_core_DES_CBC(key, iv, ciphertext);
 	}
 	console.log("decryption successful");
+	console.log(file_type);
+	$('#view-name').html(file_name);
 	// console.log(typeof(dec));
-	// console.log(dec);
-	$('#download-anchor')
-	    .prop('href',
-		  // "data:application/octet-stream;"
-		  "data:;"
-		  // = "data:application/mp4;" // for videos
-		  + "charset=utf-16le;base64,"
-		  + dec); // assume application/octet-stream
-	$('#download-anchor').prop('download', file_name);
-	$('#decryption-status').html('Decryption completed. ');
-	$('#download-anchor').show();
-	// + file_data.slice(28);
+	//console.log(dec);
+	if (file_type == 'png'){
+	    $('#view-image-anchor')
+		.prop('src', "data:image/png;base64,"+ dec);
+	    $('#decryption-status').html('Decryption completed. ');
+	    $('#view-button').show()
+	}else if (file_type == 'svg'){
+	    $('#view-image-anchor')
+		.prop('src', "data:image/svg+xml;base64,"+ dec);
+	    $('#decryption-status').html('Decryption completed. ');
+	    $('#view-button').show()
+	}else if (file_type == 'jpg' || file_type == 'jpeg'){
+	    $('#view-image-anchor')
+		.prop('src', "data:image/jpeg;base64,"+ dec);
+	    $('#decryption-status').html('Decryption completed. ');
+	    $('#view-button').show()
+	// }else if (file_type == 'mp4'){
+	//     $('#view-video-anchor')
+	// 	.prop('src', "data:video/mp4;base64,"+ dec);
+	//     $('#view-video-anchor')
+	// 	.prop('type', 'video/mp4');
+	//     $('#decryption-status').html('Decryption completed. ');
+	//     $('#view-button').show()
+	}else{
+	    $('#download-anchor')
+		.prop('href',
+		      // "data:application/octet-stream;"
+		      "data:;"
+		      // = "data:application/mp4;" // for videos
+		      + "charset=utf-16le;base64,"
+		      + dec); // assume application/octet-stream
+	    $('#download-anchor').prop('download', file_name);
+	    $('#decryption-status').html('Decryption completed. ');
+	    $('#download-anchor').show();
+	}
 
     } else {
 	console.log('No decryption keys found.');
@@ -18639,9 +18671,10 @@ function decryptFile(){
 }
 
 // console.log(listFolder);
-listFolder('');
+listFolder(username);
 $('#download-anchor').hide();
 $('#dec-key').hide();
+$('#view-button').hide();
 
 /********* Reference: ***********/
 // https://stackoverflow.com/questions/31680986/how-to-achieve-cryptojs-decryption-using-aes-128-cbc-algorithm
