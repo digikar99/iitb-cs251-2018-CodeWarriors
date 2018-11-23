@@ -11,8 +11,8 @@
 
 #set -x
 arg_list="$@"
-log_level=2 # in addition, see "exit 1" in authenticate
-host="127.0.0.1:8000/"
+log_level=0 # in addition, see "exit 1" in authenticate
+host="http://127.0.0.1:8000/"
 login_url="$host"'login/'
 upload_url="$host"'upload_file/'
 download_url='' # created in authenticate
@@ -27,7 +27,7 @@ usage="$(basename "$0") command-line interface
 
 Commands:
  help			show this help text
- sync 			upload and download the files with latest changes
+ sync 			keep files with the most recent updates on both
  upload [file|folder/]	upload the single file folder 
  download [file|folder/] download the single file / folder 
  config			provide new username and password
@@ -48,20 +48,26 @@ main() {
 	cat "$enc_file"
 	cp "$key_file" "$HOME/keys.txt"
     elif [ "$1" = "config" ]; then config
+    elif [ "$1" = "sync" ]; then
+	authenticate
+	sync
     else
 	if [ -z "$2" ]; then printf "$usage"; exit 1; fi
 	authenticate
+	pdir="$(pwd)"
+	#echo $pdir
+	if ! [[ $pdir =~ $HOME/SPC* ]];	then
+	    echo "You should operate inside $HOME/SPC"
+	    exit 1
+	fi
 	if [ "$1" = "upload" ]; then
-	    path=$(realpath "$2")
-	    if ! [[ $path =~ $HOME/SPC* ]]
-	    then
-		echo "$2 should be inside $HOME/SPC/"
-		exit 1
-	    fi
-	    upload "$2"
+	    if [ "$2" = "." ]; then item="$(pwd)"; else item="$2"; fi
+	    echo Item: $item
+	    upload "$item"
 	elif [ "$1" = "download" ]; then
-	    download "$2"
-	elif [ "$1" = "sync" ]; then sync "$2"
+	    spc_root="$(echo $HOME/SPC)"
+	    item="${2#$spc_root}"
+	    download "$item"
 	else printf "Unknown command: $1\n"; exit 1; fi
     fi
 				    
@@ -69,7 +75,8 @@ main() {
 
 config() {
     
-    printf "Change username and password: (Press Ctrl+C to cancel this action.)\n"
+    printf "Enter login details. (Press Ctrl+C to cancel this action.)\n"
+    printf "NOTE: YOU WILL NEED TO, FIRST, REGISTER ON $host\n"
     read -p "Username: " user 
     read  -p "Password: " -s pass
 
@@ -145,34 +152,62 @@ ende-change() {
 
 sync() {
     # printf "Sync is not yet ready.\n"
-
-    on_server=0 # get time stamp of the file/folder on server
-
-    on_client=$(stat -c %Z "$1")
-    difference=$(($on_client - $on_server))
-    if [ "$log_level" -gt "1" ]; then
-	on_server=$(stat -c %Z $HOME/SPC) # for testing purposes
-	echo Last update time on server: $on_server
-	echo Last update time on client: $on_client
-	difference=$(($on_client - $on_server))
-	echo $difference
-    fi
-    if [ "$difference" -gt "1" ]; then
-	upload "$2"
-    else
-	download "$2"
-    fi
+    url="$host"'download_file/all_files/'"$username/"
+    url="$(replace_spaces_in_url "$url")"
+    curl_bin="curl -s -c $cookies -b $cookies -e $url"
+    contents="$($curl_bin "$url")"
+    #echo $contents
+    server_files=$(python3 <<EOF
+for file in $contents:
+    print(file)
+EOF
+		)
+    # printf "$server_files"
+    IFS=$'\n'
+    for file in $server_files ;
+    do
+	unset IFS
+	local_file=${file#$username/}
+	if [ -f "$local_file" ]; then 
+	    time_url="$host"'download_file/last_update_time/'"$file"
+	    time_url="$(replace_spaces_in_url "$time_url")"
+	    curl_bin="curl -s -c $cookies -b $cookies -e $time_url"
+	    on_server=$($curl_bin $time_url)
+	    #echo $on_server
+	    on_client=$(stat -c %Z "$local_file")
+	    if [ "$log_level" -gt "0" ]; then
+		echo Server: $on_server
+		echo Client: $on_client
+	    fi
+	    difference=$(( $on_client - $on_server ))
+	    if [ "$difference" -gt "0" ] ; then upload_file "$local_file" ;
+	    elif [ "$difference" -lt "0" ]; then download_file "$local_file" ;
+	    fi
+	else download_file "$local_file"
+	fi
+    done
+    # At the end of this, whichever files exist on the client
+    # are the new ones. Therefore, upload all the files!
+    IFS=$'\n' # use new lines as field separators
+    subitem_list=$(find "$HOME/SPC/" -not -type d)
+    for subitem in $subitem_list; do
+	# if it exists on the server, skip
+	remote_file="$username/""${subitem#$HOME/SPC/}"
+	if [ ! -z "$server_files" ]; then
+	   exists=$(python3 -c "print(\"$remote_file\" in $contents)")
+	else exists=False ; fi
+	if [ "$exists" = "False" ]; then upload_file "$subitem"; fi
+    done
+				    
+				    
     
-    exit 0
 }
 
 upload() {
     item="$1" # handles a single file or folder
-    if [ "$item" = "." ]; then
-	item=$(pwd)
-	echo $item
-    fi
+
     if [ -d "$item" ]; then
+	delete_remote_folder "$item"
 	IFS=$'\n' # use new lines as field separators
 	subitem_list=$(find "$item" -not -type d)
 	for subitem in $subitem_list; do
@@ -185,35 +220,43 @@ upload() {
 }
 
 download() {
-    item="$1" # handles a single file or folder
-    download_url="$host"'download_file/data/'"$username/$1"
-    download_url=${download_url// /%20}
+    #echo "$1"
+    if [ ! -z "$1" ]; then local item="$(ensure_trailiing_slash "$1")";
+    else local item="$1" ; fi
+    download_url="$host"'download_file/data/'"$username/$item"
+    download_url="$(replace_spaces_in_url "$download_url")"
     curl_bin="curl -s -c $cookies -b $cookies -e ""$download_url"
     #echo "$download_url"
-    contents="$($curl_bin "$download_url")"
+    local contents="$($curl_bin "$download_url")"
     #echo $contents
-    python3 2> /dev/null -c "dir_contents = dict($contents)"
-    if [ "$?" -eq "0" ]; then
+    local temp=$(python3 -c "print(type($contents) == type({}))" 2> /dev/null)
+    # echo $temp
+    if [ "$temp" = "True" ] && [ ! -z "$contents"  ] ; then
 	# that is a dictionary indeed
-	sub_dirs=$(python3 <<EOF
+	echo Deleting $item on local...
+	rm -rf "$item"
+	local sub_dirs=$(python3 <<EOF
 dir_contents = dict($contents)
 for item in dir_contents:
     if dir_contents[item] == 'dir':
         print(item)
 EOF
 		)
-	for dir in $sub_dirs; do download "$dir"; done
-	files=$(python3 <<EOF
+	IFS=$'\n'
+	for dir in $sub_dirs; do unset IFS; download "$dir"; done
+	# echo $contents
+	local files=$(python3 <<EOF
 dir_contents = dict($contents)
 for item in dir_contents:
     if dir_contents[item] == 'file':
         print(item)
 EOF
 	     )
-	for file in $files; do download_file "$1$file"; done
+	IFS=$'\n'
+	for file in $files; do unset IFS; download_file "$item$file"; done
     else
 	# that is not a dictionary
-	download_file "$item"
+	download_file "$1"
     fi
     
 }
@@ -265,8 +308,8 @@ EOF
 	    )
 	if [ ! -z "$CURL" ]; then
 	    # echo Curl was unsuccessful
-	    $curl_bin "$host"delete"/$username/$name" > /dev/null
-	    $curl_bin "$upload_url" > -X POST -d @- <<EOF
+	    $curl_bin "$(replace_spaces_in_url "$host"delete"/$username/$name")" > /dev/null
+	    $curl_bin "$upload_url" -X POST -d @- <<EOF
 $django_token&user_name_path=$username/$name&file_data=$content&last_update_time=$lut&file_type=$type&md5sum=$md5
 EOF
 	fi	
@@ -285,6 +328,11 @@ download_file() {
     curl_bin="curl -s -c $cookies -b $cookies -e ""$download_url"
     contents="$($curl_bin "$download_url")"
     dec "$contents" "$1"
+    time_url="$host"'download_file/last_update_time/'"$username/$1"
+    time_url="$(replace_spaces_in_url "$time_url")"
+    curl_bin="curl -s -c $cookies -b $cookies -e $time_url"
+    on_server=$($curl_bin $time_url)
+    touch -d @$on_server "$1"
     #file_data=$(dec "$contents")
     #printf "$file_data" > "$1"
     
@@ -316,9 +364,50 @@ dec() {
 get_type() {
     possible_extension="${1##*.}"
     if [ "$1" = "$possible_extension" ]; then
-	read -p "Specify filetype (mp4, png, bmp, jpg, jpeg, other) of $1: " possible_extension
+	read -p "Specify filetype (mp4, png, bmp, jpg, jpeg, [other]) of $1: " possible_extension
+	if [ -z "$possible_extension" ]; then possible_extension=other; fi
     fi
     echo $possible_extension
+}
+
+ensure_trailiing_slash() {
+    echo "${1%/}/" # do not remove the new line
+}
+
+replace_spaces_in_url() {
+    echo "${1// /%20}" # do not remove the new line
+}
+
+delete_remote_folder() {
+    item="$(ensure_trailiing_slash "$1")"
+    if [ "$item" = "$HOME/SPC/" ]; then
+	all_files_url="$host"'download_file/all_files/'"$username/"
+    else
+	all_files_url="$host"'download_file/all_files/'"$username/$item"
+    fi
+    all_files_url="$(replace_spaces_in_url "$all_files_url")"
+    curl_bin="curl -s -c $cookies -b $cookies -e ""$all_files_url"
+    contents="$($curl_bin "$all_files_url")"
+    #echo "Contents: $contents"
+    if [ "$?" = "0" ]; then # indicates folder exists on remote
+	
+	file_list=$(python3 <<EOF
+for item in $contents:
+    print(item)
+EOF
+		 )
+	#echo $file_list
+	IFS=$'\n'
+	for file in $file_list; do
+	    file_url="$host"'delete/'"$file"
+	    file_url="$(replace_spaces_in_url "$file_url")"
+	    curl_bin="curl -s -c $cookies -b $cookies -e ""$file_url"
+	    unset IFS
+	    echo Deleting $file on remote...
+	    $curl_bin "$file_url" > /dev/null
+	done
+    fi
+	
 }
 
 main "$@"

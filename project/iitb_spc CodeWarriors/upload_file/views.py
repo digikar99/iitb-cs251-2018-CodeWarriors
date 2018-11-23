@@ -10,15 +10,11 @@ class UploadFileForm(forms.ModelForm):
     class Meta:
         model = models.File
         fields = ['user_name_path', 'file_data',
-                  'last_update_time', 'md5sum']
-    # def save(self, user):
-    #     obj = super().save(commit = False)
-    #     obj.owner = user
-    #     obj.save()
-    #     return obj
+                  'last_update_time', 'file_type', 'md5sum']
+        
 class UploadFile(generic.CreateView):
     template_name='upload_file/file_upload.html'
-    form_class=UploadFileForm # (initial={'owner':request.user.id})
+    form_class=UploadFileForm
     success_url = '/home'
     # def dispatch(self, *args, **kwargs):
     #     return super(UploadFile, self).dispatch(*args, **kwargs)
@@ -28,4 +24,3 @@ class UploadFile(generic.CreateView):
     #     obj.owner = self.request.user
     #     obj.save()
     #     return redirect(('/home'))
-
