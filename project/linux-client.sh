@@ -221,35 +221,39 @@ upload() {
 
 download() {
     #echo "$1"
-    if [ ! -z "$1" ]; then item="$(ensure_trailiing_slash "$1")";
-    else item="$1" ; fi
+    if [ ! -z "$1" ]; then local item="$(ensure_trailiing_slash "$1")";
+    else local item="$1" ; fi
     download_url="$host"'download_file/data/'"$username/$item"
     download_url="$(replace_spaces_in_url "$download_url")"
     curl_bin="curl -s -c $cookies -b $cookies -e ""$download_url"
     #echo "$download_url"
-    contents="$($curl_bin "$download_url")"
+    local contents="$($curl_bin "$download_url")"
     #echo $contents
-    python3 2> /dev/null -c "dir_contents = dict($contents)"
-    if [ "$?" -eq "0" ] && [ ! -z "$contents"  ] ; then
+    local temp=$(python3 -c "print(type($contents) == type({}))" 2> /dev/null)
+    # echo $temp
+    if [ "$temp" = "True" ] && [ ! -z "$contents"  ] ; then
 	# that is a dictionary indeed
 	echo Deleting $item on local...
-	rm -r "$item"
-	sub_dirs=$(python3 <<EOF
+	rm -rf "$item"
+	local sub_dirs=$(python3 <<EOF
 dir_contents = dict($contents)
 for item in dir_contents:
     if dir_contents[item] == 'dir':
         print(item)
 EOF
 		)
-	for dir in $sub_dirs; do download "$dir"; done
-	files=$(python3 <<EOF
+	IFS=$'\n'
+	for dir in $sub_dirs; do unset IFS; download "$dir"; done
+	# echo $contents
+	local files=$(python3 <<EOF
 dir_contents = dict($contents)
 for item in dir_contents:
     if dir_contents[item] == 'file':
         print(item)
 EOF
 	     )
-	for file in $files; do download_file "$item$file"; done
+	IFS=$'\n'
+	for file in $files; do unset IFS; download_file "$item$file"; done
     else
 	# that is not a dictionary
 	download_file "$1"
