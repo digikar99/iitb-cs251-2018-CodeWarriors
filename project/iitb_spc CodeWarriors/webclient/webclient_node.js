@@ -150,6 +150,7 @@ function decrypt_core_AES_CBC(key, iv, ciphertext) {
     }); 
     //console.log(message);
     message.replace('','');
+    mesasge.replace('','');
     return CryptoJS.enc.Base64.stringify(message);
 }
 
