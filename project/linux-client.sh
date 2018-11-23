@@ -130,19 +130,23 @@ authenticate() {
 
 ende-change() {
     printf "Choose an encryptions scheme: \n 1. AES-CBC-192 \n 2. Triple DES 192 "
-    printf "\n 3. Camellia-CBC-192 (NOTE: Doesn't work in webclient.)\n(Or press Ctrl+C to cancel.)\nEnter [1], 2 or 3: "
+    printf "\n 3. DES-CBC-64 \n(Or press Ctrl+C to cancel.)\nEnter [1], 2 or 3: "
     read choice
     if [ -z "$choice" ]; then choice=1; fi
     touch $key_file
     if [ "$choice" = "1" ]; then
 	echo -aes-192-cbc > $enc_file
-    elif  [ "$choice" = "2" ]; then
-	echo -des-ede3-cbc > $enc_file
-    elif  [ "$choice" = "3" ]; then
-	echo -camellia-192-cbc > $enc_file
-    fi
     key=$(openssl rand -hex 24)
     iv=$(openssl rand -hex 16)
+    elif  [ "$choice" = "2" ]; then
+	echo -des-ede3-cbc > $enc_file
+	key=$(openssl rand -hex 24)
+    iv=$(openssl rand -hex 16)
+    elif  [ "$choice" = "3" ]; then
+	echo -des-cbc > $enc_file
+	key=$(openssl rand -hex 8)
+    iv=$(openssl rand -hex 16)
+    fi
     printf "$key\n$iv\n" > $key_file
 }
 
