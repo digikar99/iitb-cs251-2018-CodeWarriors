@@ -54,7 +54,7 @@ def getContents(request, file_path=None):
         else:
             time_diff = Session.get_time() - prev_Session[0].get_time()
             if time_diff.total_seconds() > 15 * 60 or Session.ip == prev_Session[0].ip:
-                pass
+                Session.save()
             else:
                 return HttpResponseForbidden()
             home_dir = request.user.username + '/'
