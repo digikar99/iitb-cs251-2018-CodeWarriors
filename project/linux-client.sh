@@ -194,9 +194,6 @@ EOF
     for subitem in $subitem_list; do
 	# if it exists on the server, skip
 	remote_file="$username/""${subitem#$HOME/SPC/}"
-	if [ ! -z "$server_files" ]; then
-	   exists=$(python3 -c "print(\"$remote_file\" in $contents)")
-	else exists=False ; fi
 	if [ "$exists" = "False" ]; then upload_file "$subitem"; fi
     done
 				    
