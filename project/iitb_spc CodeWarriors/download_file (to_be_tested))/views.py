@@ -3,6 +3,7 @@ from upload_file.models import File
 from django.contrib.auth.models import User
 from django.http import HttpResponse, HttpResponseForbidden, JsonResponse
 from django.core.exceptions import ObjectDoesNotExist
+from django.core import serializers
 from .models import UserSession
 
 def getChildrenOfFolder(fold_name):
@@ -11,7 +12,7 @@ def getChildrenOfFolder(fold_name):
     # and we already know that fold_name ends in '/'
 
     # create {name: type} pairs for easy parsing in webclient
-    print('========================================')
+    # print('========================================')
     # print(l)
     name_type = dict()
     for f in l:
@@ -24,6 +25,7 @@ def getChildrenOfFolder(fold_name):
             name_type[f1] = 'file'
 
     return name_type
+
 
 def getChildrenOfRootFolder():
     # check for user.id
@@ -50,7 +52,8 @@ def getContents(request, file_path=None):
         if not prev_Session:
             Session.save()
         else:
-            if prev_Session[0].ip==Session.ip or Session.time - prev_Session[0].time > 15*60:
+            time_diff = Session.ip or Session.time - prev_Session[0].time
+            if prev_Session[0].ip == time_diff.timediff.total_seconds() > 15*60:
                 prev_Session.delete()
                 Session.save()
             else:
@@ -82,5 +85,43 @@ def getContents(request, file_path=None):
 
 def getMd5sum(request, file_path):
     if (request.user.is_authenticated
-        and request.user.username == file_path.split('/')[0]):
-        pass
+            and request.user.username == file_path.split('/')[0]):
+        return HttpResponse(File.objects.get(user_name_path=file_path).md5sum)
+    else:
+        return HttpResponseForbidden()
+
+
+def getLastUpdateTime(request, file_path):
+    if (request.user.is_authenticated
+            and request.user.username == file_path.split('/')[0]):
+        return HttpResponse(File.objects.get(user_name_path=file_path).last_update_time)
+    else:
+        return HttpResponseForbidden()
+
+
+def getFileType(request, file_path):
+    if (request.user.is_authenticated
+            and request.user.username == file_path.split('/')[0]):
+        return HttpResponse(File.objects.get(user_name_path=file_path).file_type)
+    else:
+        return HttpResponseForbidden()
+
+
+def getAllFiles(request, file_path=None):
+    if file_path is None:
+        return HttpResponseForbidden()
+    elif (request.user.is_authenticated
+          and request.user.username == file_path.split('/')[0]):
+        if (file_path.endswith('/')):
+            dic = dict()
+            l = File.objects.filter(user_name_path__startswith=file_path)
+            for f in l:
+                dic[f.user_name_path] = ""
+            return JsonResponse(dic)
+            # return HttpResponse('\n'.join(l)) # html ignores new lines
+        else:
+            return HttpResponseForbidden()
+    else:
+        return HttpResponseForbidden()
+
+
