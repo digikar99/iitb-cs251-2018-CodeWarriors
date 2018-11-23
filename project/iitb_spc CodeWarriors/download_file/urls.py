@@ -10,6 +10,7 @@ urlpatterns = [
     path('all_files/<path:file_path>', views.getAllFiles),
     path('data/', views.getContents),
     path('all_files/', views.getAllFiles),
+     path('sucess/', views.sucessUrl),
     # path('', views.getMd5sum), # guaranteed that this is not a folder
     # path('', views.getLut), # guaranteed that this is not a folder
     # path('', views.getType), # guaranteed that this is not a folder

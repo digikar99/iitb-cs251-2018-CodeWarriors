@@ -5,6 +5,8 @@ from django.contrib.auth.models import User
 from django.http import HttpResponse, HttpResponseForbidden, JsonResponse
 from django.core.exceptions import ObjectDoesNotExist
 from django.core import serializers
+from .models import UserSession
+
 
 def getChildrenOfFolder(fold_name):
     # check for user.id
@@ -26,6 +28,7 @@ def getChildrenOfFolder(fold_name):
 
     return name_type
 
+
 def getChildrenOfRootFolder():
     # check for user.id
     l = File.objects.all()
@@ -41,61 +44,78 @@ def getChildrenOfRootFolder():
 
     return name_type
 
+
 def getContents(request, file_path=None):
-    home_dir = request.user.username + '/'
-    if file_path is None:
-        return HttpResponseForbidden()
-    elif (request.user.is_authenticated
-          and file_path.startswith(home_dir)):
-        print("File path: " + file_path)
-        #if file_path == home_dir:
-        if file_path.endswith('/'):
-            l = getChildrenOfFolder(file_path)
-            print("Children: " + str(l));
-            if l != {}:
-                return JsonResponse(l)
-            else:
-                return HttpResponseForbidden()
-        # elif (file_path.endswith('/')):
-        #     # then this is possibly a directory
-        #     l = getChildrenOfFolder(file_path)
-        #     return [ JsonResponse(l) if l != {} \
-        #              else HttpResponseForbidden() ]
+    if request.user.is_authenticated:
+        Session = UserSession.create(request)
+        prev_Session = UserSession.objects.filter(username=request.user)
+        if not prev_Session:
+            Session.save()
         else:
-            f = File.objects.filter(user_name_path = file_path);
-            if len(f) == 0:
-                return HttpResponseForbidden()
+            time_diff = Session.get_time() - prev_Session[0].get_time()
+            if time_diff.total_seconds() > 15 * 60 or Session.ip == prev_Session[0].ip:
+                pass
             else:
-                return HttpResponse(f[0].file_data)
+                return HttpResponseForbidden()
+            home_dir = request.user.username + '/'
+            if file_path is None:
+                return HttpResponseForbidden()
+            elif (request.user.is_authenticated
+                  and file_path.startswith(home_dir)):
+                print("File path: " + file_path)
+                # if file_path == home_dir:
+                if file_path.endswith('/'):
+                    l = getChildrenOfFolder(file_path)
+                    print("Children: " + str(l));
+                    if l != {}:
+                        return JsonResponse(l)
+                    else:
+                        return HttpResponseForbidden()
+                # elif (file_path.endswith('/')):
+                #     # then this is possibly a directory
+                #     l = getChildrenOfFolder(file_path)
+                #     return [ JsonResponse(l) if l != {} \
+                #              else HttpResponseForbidden() ]
+                else:
+                    f = File.objects.filter(user_name_path=file_path);
+                    if len(f) == 0:
+                        return HttpResponseForbidden()
+                    else:
+                        temp_data = f[0].file_data
+                        return HttpResponse(temp_data)
+            else:
+                return HttpResponseForbidden()
     else:
         return HttpResponseForbidden()
 
+
 def getMd5sum(request, file_path):
     if (request.user.is_authenticated
-        and request.user.username == file_path.split('/')[0]):
+            and request.user.username == file_path.split('/')[0]):
         return HttpResponse(File.objects.get(user_name_path=file_path).md5sum)
     else:
         return HttpResponseForbidden()
 
+
 def getLastUpdateTime(request, file_path):
     if (request.user.is_authenticated
-        and request.user.username == file_path.split('/')[0]):
+            and request.user.username == file_path.split('/')[0]):
         return HttpResponse(File.objects.get(user_name_path=file_path).last_update_time)
     else:
         return HttpResponseForbidden()
 
 def getFileType(request, file_path):
     if (request.user.is_authenticated
-        and request.user.username == file_path.split('/')[0]):
+            and request.user.username == file_path.split('/')[0]):
         return HttpResponse(File.objects.get(user_name_path=file_path).file_type)
     else:
         return HttpResponseForbidden()
-    
+
 def getAllFiles(request, file_path=None):
     if file_path is None:
         return HttpResponseForbidden()
     elif (request.user.is_authenticated
-        and request.user.username == file_path.split('/')[0]):
+          and request.user.username == file_path.split('/')[0]):
         if (file_path.endswith('/')):
             dic = dict()
             l = File.objects.filter(user_name_path__startswith=file_path)
@@ -108,4 +128,11 @@ def getAllFiles(request, file_path=None):
     else:
         return HttpResponseForbidden()
 
-            
+
+def sucessUrl(request):
+    if request.user.is_authenticated:
+        Session = UserSession.objects.filter(username=request.user)
+        Session.delete()
+        return HttpResponse('Sucess\n')
+    else:
+        return HttpResponseForbidden()
