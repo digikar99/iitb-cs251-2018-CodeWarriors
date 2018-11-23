@@ -68,6 +68,7 @@ main() {
 	    spc_root="$(echo $HOME/SPC)"
 	    item="${2#$spc_root}"
 	    download "$item"
+	    curl -s -c "$cookies" -b "$cookies" -e "$host"'download_file/sucess/' "$host"'download_file/sucess/';
 	else printf "Unknown command: $1\n"; exit 1; fi
     fi
 				    
